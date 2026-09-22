@@ -417,8 +417,8 @@ const ORIGINAL = {"main": [["2025-01", "-68498.96", "200782.77", "9444.40", "207
 const KEY = "dashboard_saldo_devedor_v1";
 // Supabase: use somente a URL do projeto e a chave PUBLISHABLE (sb_publishable_...).
 // Nunca coloque a chave SECRET (sb_secret_...) neste arquivo.
-const SUPABASE_URL = "https://xxxxxxxxxxxxxxxx.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_........";
+const SUPABASE_URL = "https://yayfspvqwuefbtiyttnr.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_iOxhPw26ASUO9WaNcc7HfA_dR1XjyKp";
 const supabaseReady = SUPABASE_URL.startsWith("https://") && SUPABASE_PUBLISHABLE_KEY.startsWith("sb_") && !SUPABASE_URL.includes("COLE_AQUI") && !SUPABASE_PUBLISHABLE_KEY.includes("COLE_AQUI");
 const supabaseClient = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
 const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "main"};
