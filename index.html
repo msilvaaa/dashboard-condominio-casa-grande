@@ -361,7 +361,9 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
       <label>Senha
         <input id="loginPass" type="password" autocomplete="current-password" placeholder="Digite a senha">
       </label>
-      
+    </div>
+    <div style="margin-top:10px;text-align:center">
+      <button type="button" class="btn ghost" id="forgotPassword" style="font-size:11px;padding:8px 10px">Esqueci minha senha</button>
     </div>
     <div id="loginError" class="login-error"></div>
     <div class="login-actions">
@@ -371,6 +373,28 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
   </div>
 </div>
 
+<div id="passwordRecoveryModal" class="login-modal" aria-hidden="true">
+  <div class="login-box">
+    <div class="login-head">
+      <div class="eyebrow">Recuperação de acesso</div>
+      <div class="login-title">Criar nova senha</div>
+      <div class="login-sub">Digite sua nova senha e confirme abaixo.</div>
+    </div>
+    <div class="login-fields">
+      <label>Nova senha
+        <input id="newPassword" type="password" autocomplete="new-password" placeholder="Digite a nova senha">
+      </label>
+      <label>Confirmar nova senha
+        <input id="confirmNewPassword" type="password" autocomplete="new-password" placeholder="Digite novamente a senha">
+      </label>
+    </div>
+    <div id="passwordRecoveryError" class="login-error"></div>
+    <div class="login-actions">
+      <button type="button" class="btn ghost" id="cancelPasswordRecovery">Cancelar</button>
+      <button type="button" class="btn primary" id="saveNewPassword">Salvar nova senha</button>
+    </div>
+  </div>
+</div>
 <div id="editorModal" class="modal" aria-hidden="true">
   <div class="modal-box">
     <div class="modal-head"><div><div class="eyebrow">Base de dados</div><h2 style="margin:4px 0 0">Editar e alimentar o dashboard</h2></div><button class="btn ghost" id="closeEditor">Fechar</button></div>
@@ -397,13 +421,6 @@ const SUPABASE_URL = "https://xxxxxxxxxxxxxxxx.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_........";
 const supabaseReady = SUPABASE_URL.startsWith("https://") && SUPABASE_PUBLISHABLE_KEY.startsWith("sb_") && !SUPABASE_URL.includes("COLE_AQUI") && !SUPABASE_PUBLISHABLE_KEY.includes("COLE_AQUI");
 const supabaseClient = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
-if (supabaseClient) {
-  supabaseClient.auth.onAuthStateChange((event, session) => {
-    if (event === "PASSWORD_RECOVERY") {
-      alert("RECUPERAÇÃO DE SENHA DETECTADA");
-    }
-  });
-}
 const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "main"};
 (function syncInitialPeriod(){
   const months=allDataMonths();
@@ -1172,6 +1189,89 @@ function printDashboard(){
 document.getElementById("printDashboard").addEventListener("click",printDashboard);
 applyTheme();
 
+function openPasswordRecovery(){
+  const modal=document.getElementById("passwordRecoveryModal");
+  const error=document.getElementById("passwordRecoveryError");
+  const password=document.getElementById("newPassword");
+  const confirmPassword=document.getElementById("confirmNewPassword");
+  if(!modal)return;
+  if(error) error.textContent="";
+  if(password) password.value="";
+  if(confirmPassword) confirmPassword.value="";
+  closeLogin();
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden","false");
+  setTimeout(()=>password?.focus(),50);
+}
+function closePasswordRecovery(){
+  const modal=document.getElementById("passwordRecoveryModal");
+  if(!modal)return;
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden","true");
+}
+async function sendPasswordRecovery(){
+  const email=document.getElementById("loginUser").value.trim();
+  const error=document.getElementById("loginError");
+  if(!supabaseClient){
+    error.textContent="Supabase ainda não foi configurado neste arquivo.";
+    return;
+  }
+  if(!email){
+    error.textContent="Digite seu e-mail primeiro.";
+    document.getElementById("loginUser").focus();
+    return;
+  }
+  error.textContent="Enviando e-mail de recuperação...";
+  const {error:resetError}=await supabaseClient.auth.resetPasswordForEmail(email,{
+    redirectTo:window.location.origin
+  });
+  if(resetError){
+    error.textContent="Erro ao enviar: "+resetError.message;
+    return;
+  }
+  error.textContent="E-mail enviado! Verifique sua caixa de entrada.";
+}
+async function saveNewPassword(){
+  const password=document.getElementById("newPassword").value;
+  const confirmPassword=document.getElementById("confirmNewPassword").value;
+  const error=document.getElementById("passwordRecoveryError");
+  const btn=document.getElementById("saveNewPassword");
+  if(!supabaseClient){
+    error.textContent="Supabase ainda não foi configurado neste arquivo.";
+    return;
+  }
+  if(password.length<8){
+    error.textContent="A nova senha deve ter pelo menos 8 caracteres.";
+    return;
+  }
+  if(password!==confirmPassword){
+    error.textContent="As senhas não conferem.";
+    return;
+  }
+  btn.disabled=true;
+  const oldText=btn.textContent;
+  btn.textContent="Salvando...";
+  error.textContent="";
+  const {error:updateError}=await supabaseClient.auth.updateUser({password});
+  btn.disabled=false;
+  btn.textContent=oldText;
+  if(updateError){
+    error.textContent="Não foi possível alterar a senha: "+updateError.message;
+    return;
+  }
+  closePasswordRecovery();
+  await supabaseClient.auth.signOut();
+  try{sessionStorage.setItem("dashboard_edit_auth","0");}catch(e){}
+  alert("Senha alterada com sucesso! Agora clique em Editar dados e entre com a nova senha.");
+}
+if(supabaseClient){
+  supabaseClient.auth.onAuthStateChange((event)=>{
+    if(event==="PASSWORD_RECOVERY"){
+      setTimeout(openPasswordRecovery,0);
+    }
+  });
+}
+
 function isEditorAuthenticated(){
   if(!supabaseClient) return false;
   try{return sessionStorage.getItem("dashboard_edit_auth")==="1";}catch(e){return false;}
@@ -1238,37 +1338,18 @@ document.getElementById("openEditor").addEventListener("click",async()=>{
   }
 });
 document.getElementById("submitLogin").addEventListener("click",attemptLogin);
-document.getElementById("forgotPassword").addEventListener("click", async () => {
-  const email = document.getElementById("loginUser").value.trim();
-  const error = document.getElementById("loginError");
-
-  if (!email) {
-    error.textContent = "Digite seu e-mail primeiro.";
-    document.getElementById("loginUser").focus();
-    return;
-  }
-
-  error.textContent = "Enviando e-mail de recuperação...";
-
-  const { error: resetError } =
-    await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin
-    });
-
-  if (resetError) {
-    error.textContent = "Erro ao enviar: " + resetError.message;
-    return;
-  }
-
-  error.textContent = "E-mail enviado! Verifique sua caixa de entrada.";
-});
+document.getElementById("forgotPassword").addEventListener("click",sendPasswordRecovery);
 document.getElementById("cancelLogin").addEventListener("click",closeLogin);
 document.getElementById("loginPass").addEventListener("keydown",e=>{
-
-
-
   if(e.key==="Enter") attemptLogin();
-  
+});
+document.getElementById("cancelPasswordRecovery").addEventListener("click",closePasswordRecovery);
+document.getElementById("saveNewPassword").addEventListener("click",saveNewPassword);
+document.getElementById("passwordRecoveryModal").addEventListener("click",e=>{
+  if(e.target.id==="passwordRecoveryModal") closePasswordRecovery();
+});
+document.getElementById("confirmNewPassword").addEventListener("keydown",e=>{
+  if(e.key==="Enter") saveNewPassword();
 });
 document.getElementById("loginUser").addEventListener("keydown",e=>{
   if(e.key==="Enter") document.getElementById("loginPass").focus();
