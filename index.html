@@ -396,6 +396,13 @@ const SUPABASE_URL = "https://xxxxxxxxxxxxxxxx.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_........";
 const supabaseReady = SUPABASE_URL.startsWith("https://") && SUPABASE_PUBLISHABLE_KEY.startsWith("sb_") && !SUPABASE_URL.includes("COLE_AQUI") && !SUPABASE_PUBLISHABLE_KEY.includes("COLE_AQUI");
 const supabaseClient = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+if (supabaseClient) {
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === "PASSWORD_RECOVERY") {
+      alert("RECUPERAÇÃO DE SENHA DETECTADA");
+    }
+  });
+}
 const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "main"};
 (function syncInitialPeriod(){
   const months=allDataMonths();
