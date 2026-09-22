@@ -238,6 +238,7 @@ html.dark svg [fill="#172033"]{fill:#e5e7eb !important}
 html.dark svg [fill="#ffffff"]{fill:#111827 !important}
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   try{
     if(localStorage.getItem("dashboard_theme")==="dark"){
@@ -354,8 +355,8 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
       <div class="login-sub">Informe usuário e senha para abrir o editor do dashboard.</div>
     </div>
     <div class="login-fields">
-      <label>Usuário
-        <input id="loginUser" type="text" autocomplete="username" placeholder="Digite o usuário">
+      <label>E-mail
+        <input id="loginUser" type="email" autocomplete="username" placeholder="Digite o e-mail">
       </label>
       <label>Senha
         <input id="loginPass" type="password" autocomplete="current-password" placeholder="Digite a senha">
@@ -389,6 +390,12 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
 <script>
 const ORIGINAL = {"main": [["2025-01", "-68498.96", "200782.77", "9444.40", "207440.77", "6658.00", "-"], ["2025-02", "-4646.84", "167006.92", "9075.00", "173009.92", "6003.00", "63852.12"], ["2025-03", "-17959.11", "108157.87", "9075.00", "114150.87", "5993.00", "-13312.27"], ["2025-04", "-25154.32", "95228.50", "9000.00", "100488.50", "5260.00", "-7195.21"], ["2025-05", "-22027.73", "124255.45", "8925.00", "129505.45", "5250.00", "3126.59"], ["2025-06", "-50881.28", "95556.95", "9000.00", "101066.95", "5510.00", "-28853.55"], ["2025-07", "-48736.82", "115102.64", "10611.93", "120872.64", "5770.00", "2144.46"], ["2025-08", "-56514.92", "102640.73", "9179.67", "107895.73", "5255.00", "-7778.10"], ["2025-09", "-77192.17", "101295.00", "9297.20", "106810.00", "5515.00", "-20677.25"], ["2025-10", "7300.37", "206918.81", "9750.00", "212168.81", "5250.00", "84492.54"], ["2025-11", "-28566.58", "112918.05", "9672.20", "118428.05", "5510.00", "-35866.95"], ["2025-12", "-41195.41", "142967.64", "9825.00", "148482.64", "5515.00", "-12628.83"], ["2026-01", "-62549.59", "106043.62", "9372.20", "111463.62", "5420.00", "-21354.18"], ["2026-02", "-83119.88", "100891.47", "8925.00", "105816.47", "4925.00", "-20570.29"], ["2026-03", "-109118.32", "99678.90", "9375.00", "105127.30", "5448.40", "-25998.44"], ["2026-04", "-120926.53", "101962.13", "9000.00", "107392.13", "5430.00", "-11808.21"], ["2026-05", "-154046.58", "94164.70", "9075.00", "99603.10", "5438.40", "-33120.05"], ["2026-06", "-158309.90", "100993.00", "9525.00", "106668.00", "5675.00", "-4263.32"], ["2026-07", "-800.87", "96201.62", "9450.00", "101126.62", "4925.00", "157509.03"], ["2026-08", "-2261.55", "101161.94", "0", "106841.94", "5680.00", "-1460.68"]], "utilities": [["2025-04", "23905.98", "3159.65"], ["2025-05", "23905.98", "3030.39"], ["2025-06", "23905.98", "3244.48"], ["2025-07", "23905.98", "3222.87"], ["2025-08", "23905.98", "3068.20"], ["2025-09", "23905.98", "3465.47"], ["2025-10", "23905.98", "3293.90"], ["2025-11", "23905.98", "3891.06"], ["2025-12", "24710.72", "3270.87"], ["2026-01", "26239.72", "2950.14"], ["2026-02", "26239.57", "3509.19"], ["2026-03", "26239.72", "3696.50"], ["2026-04", "26239.72", "3680.51"], ["2026-05", "26239.72", "3990.88"], ["2026-06", "26239.72", "3748.74"], ["2026-07", "26239.72", "4115.97"], ["2026-08", "26006.61", "4326.38"]], "postal": [["2025-01", "0"], ["2025-02", "0"], ["2025-03", "0"], ["2025-04", "0"], ["2025-05", "0"], ["2025-06", "0"], ["2025-07", "0"], ["2025-08", "667.70"], ["2025-09", "603.10"], ["2025-10", "140.60"], ["2025-11", "492.35"], ["2025-12", "279.90"], ["2026-01", "386.30"], ["2026-02", "505.15"], ["2026-03", "245.75"], ["2026-04", "400.50"], ["2026-05", "154.00"], ["2026-06", "708.00"], ["2026-07", "750.60"], ["2026-08", "273.05"]], "homero": [["2025-08", "1000", "0"], ["2025-09", "1000", "1072.68"], ["2025-10", "3230", "1933.88"], ["2025-11", "1000", "2377.12"], ["2025-12", "5800", "5626.45"], ["2026-01", "1000", "1035.61"], ["2026-02", "1000", "1133.99"], ["2026-03", "2000", "966.44"], ["2026-04", "1000", "0"], ["2026-05", "1000", "1982.43"], ["2026-06", "1000", "0"], ["2026-07", "1000", "2262.89"], ["2026-08", "1000", "776.27"], ["2026-09", "1000", "820.40"]], "internetGas": [["2025-04", "116.59", "69.56"], ["2025-05", "113.20", "69.92"], ["2025-06", "109.99", "70.18"], ["2025-07", "113.20", "70.18"], ["2025-08", "109.99", "69.71"], ["2025-09", "112.69", "69.20"], ["2025-10", "205.73", "69.20"], ["2025-11", "318.18", "69.18"], ["2025-12", "309.97", "69.16"], ["2026-01", "316.44", "69.14"], ["2026-02", "309.97", "67.79"], ["2026-03", "309.97", "66.04"], ["2026-04", "309.97", "66.04"], ["2026-05", "309.97", "67.29"], ["2026-06", "309.97", "67.39"], ["2026-07", "309.97", "66.72"], ["2026-08", "309.97", "67.44"]]};
 const KEY = "dashboard_saldo_devedor_v1";
+// Supabase: use somente a URL do projeto e a chave PUBLISHABLE (sb_publishable_...).
+// Nunca coloque a chave SECRET (sb_secret_...) neste arquivo.
+const SUPABASE_URL = "https://xxxxxxxxxxxxxxxx.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_........";
+const supabaseReady = SUPABASE_URL.startsWith("https://") && SUPABASE_PUBLISHABLE_KEY.startsWith("sb_") && !SUPABASE_URL.includes("COLE_AQUI") && !SUPABASE_PUBLISHABLE_KEY.includes("COLE_AQUI");
+const supabaseClient = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
 const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "main"};
 (function syncInitialPeriod(){
   const months=allDataMonths();
@@ -401,7 +408,52 @@ const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "m
 
 function clone(x){ return JSON.parse(JSON.stringify(x)); }
 function loadData(){ try{ const s=localStorage.getItem(KEY); return s?JSON.parse(s):clone(ORIGINAL); }catch(e){ return clone(ORIGINAL); } }
-function persist(){ try{ localStorage.setItem(KEY,JSON.stringify(state.data)); }catch(e){} }
+function persistLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(state.data)); }catch(e){} }
+async function loadCloudData(){
+  if(!supabaseClient) return {ok:false, reason:"not_configured"};
+  try{
+    const {data,error}=await supabaseClient.from("dashboard_data").select("data,updated_at").eq("id","current").maybeSingle();
+    if(error) throw error;
+    if(data && data.data){
+      state.data=clone(data.data);
+      persistLocal();
+      return {ok:true,updated_at:data.updated_at};
+    }
+    return {ok:true,empty:true};
+  }catch(error){
+    console.error("Supabase load error:",error);
+    return {ok:false,reason:"error",error};
+  }
+}
+async function persist(){
+  persistLocal();
+  if(!supabaseClient) return {ok:false,reason:"not_configured"};
+  try{
+    const {error}=await supabaseClient.from("dashboard_data").upsert({id:"current",data:state.data,updated_at:new Date().toISOString()},{onConflict:"id"});
+    if(error) throw error;
+    return {ok:true};
+  }catch(error){
+    console.error("Supabase save error:",error);
+    return {ok:false,reason:"error",error};
+  }
+}
+async function bootCloudSync(){
+  if(!supabaseClient){
+    console.warn("Supabase ainda não configurado. Preencha SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY.");
+    return;
+  }
+  const result=await loadCloudData();
+  if(result.ok && !result.empty){
+    syncInitialPeriod();
+    fillPeriodSelectors();
+    render();
+    toast("Dados sincronizados com a nuvem.");
+  }else if(result.ok && result.empty){
+    toast("Nuvem conectada. Os dados serão enviados ao salvar pela primeira vez.");
+  }else{
+    toast("Não foi possível carregar a nuvem. Os dados locais continuam disponíveis.");
+  }
+}
 function money(v){ const n=Number(v); return Number.isFinite(n)?n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}):"—"; }
 function compactMoney(v){
   const n=Number(v);
@@ -1112,10 +1164,18 @@ function printDashboard(){
 document.getElementById("printDashboard").addEventListener("click",printDashboard);
 applyTheme();
 
-const EDIT_USER = "admin"; const EDIT_PASSWORD = "4lf4j0re5H";
-
 function isEditorAuthenticated(){
+  if(!supabaseClient) return false;
   try{return sessionStorage.getItem("dashboard_edit_auth")==="1";}catch(e){return false;}
+}
+async function refreshEditorSession(){
+  if(!supabaseClient) return false;
+  try{
+    const {data}=await supabaseClient.auth.getSession();
+    const ok=!!data.session;
+    try{sessionStorage.setItem("dashboard_edit_auth",ok?"1":"0");}catch(e){}
+    return ok;
+  }catch(e){return false;}
 }
 function openLogin(){
   const modal=document.getElementById("loginModal");
@@ -1123,7 +1183,7 @@ function openLogin(){
   const pass=document.getElementById("loginPass");
   const err=document.getElementById("loginError");
   if(!modal)return;
-  err.textContent="";
+  err.textContent=supabaseClient?"":"Configure o Supabase no arquivo HTML para habilitar a edição compartilhada.";
   user.value="";
   pass.value="";
   modal.classList.add("open");
@@ -1136,23 +1196,33 @@ function closeLogin(){
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden","true");
 }
-function attemptLogin(){
+async function attemptLogin(){
   const user=document.getElementById("loginUser").value.trim();
   const pass=document.getElementById("loginPass").value;
   const err=document.getElementById("loginError");
-  if(user===EDIT_USER && pass===EDIT_PASSWORD){
-    try{sessionStorage.setItem("dashboard_edit_auth","1");}catch(e){}
-    closeLogin();
-    document.getElementById("editorModal").classList.add("open");
-    renderEditor();
-    toast("Acesso autorizado.");
-  }else{
-    err.textContent="Usuário ou senha incorretos.";
-    document.getElementById("loginPass").select();
+  if(!supabaseClient){
+    err.textContent="Supabase ainda não foi configurado neste arquivo.";
+    return;
   }
+  if(!user || !pass){
+    err.textContent="Informe o e-mail e a senha.";
+    return;
+  }
+  err.textContent="Entrando...";
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email:user,password:pass});
+  if(error || !data.session){
+    err.textContent="E-mail ou senha incorretos.";
+    document.getElementById("loginPass").select();
+    return;
+  }
+  try{sessionStorage.setItem("dashboard_edit_auth","1");}catch(e){}
+  closeLogin();
+  document.getElementById("editorModal").classList.add("open");
+  renderEditor();
+  toast("Acesso autorizado e conectado à nuvem.");
 }
-document.getElementById("openEditor").addEventListener("click",()=>{
-  if(isEditorAuthenticated()){
+document.getElementById("openEditor").addEventListener("click",async()=>{
+  if(await refreshEditorSession()){
     document.getElementById("editorModal").classList.add("open");
     renderEditor();
   }else{
@@ -1172,10 +1242,25 @@ document.getElementById("loginModal").addEventListener("click",e=>{
 });
 
 document.getElementById("closeEditor").addEventListener("click",()=>document.getElementById("editorModal").classList.remove("open"));
-document.getElementById("saveData").addEventListener("click",()=>{persist();render();document.getElementById("editorModal").classList.remove("open");toast("Dados salvos com sucesso.")});
-document.getElementById("resetData").addEventListener("click",()=>{if(confirm("Restaurar todos os dados originais da planilha?")){state.data=clone(ORIGINAL);persist();render();renderEditor();toast("Dados originais restaurados.")}});
+document.getElementById("saveData").addEventListener("click",async()=>{
+  const btn=document.getElementById("saveData");
+  const oldText=btn.textContent;
+  btn.disabled=true; btn.textContent="Salvando...";
+  const result=await persist();
+  btn.disabled=false; btn.textContent=oldText;
+  if(result.ok){
+    render();
+    document.getElementById("editorModal").classList.remove("open");
+    toast("Dados salvos na nuvem com sucesso.");
+  }else if(result.reason==="not_configured"){
+    toast("Supabase ainda não foi configurado neste arquivo.");
+  }else{
+    toast("Não foi possível salvar na nuvem. Verifique sua conexão e tente novamente.");
+  }
+});
+document.getElementById("resetData").addEventListener("click",async()=>{if(confirm("Restaurar todos os dados originais da planilha?")){state.data=clone(ORIGINAL);const result=await persist();render();renderEditor();toast(result.ok?"Dados originais restaurados e salvos na nuvem.":"Dados originais restaurados localmente; não foi possível salvar na nuvem.")}});
 document.getElementById("exportJson").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(state.data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="dados-dashboard-saldo-devedor.json";a.click();URL.revokeObjectURL(a.href)});
-document.getElementById("importJson").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());if(!obj.main||!obj.utilities||!obj.postal||!obj.homero)throw new Error();state.data=obj;persist();render();renderEditor();toast("Dados importados.")}catch(err){toast("Arquivo JSON inválido.")}e.target.value=""});
+document.getElementById("importJson").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());if(!obj.main||!obj.utilities||!obj.postal||!obj.homero)throw new Error();state.data=obj;const result=await persist();render();renderEditor();toast(result.ok?"Dados importados e salvos na nuvem.":"Dados importados localmente; não foi possível salvar na nuvem.")}catch(err){toast("Arquivo JSON inválido.")}e.target.value=""});
 document.getElementById("editorModal").addEventListener("click",e=>{if(e.target.id==="editorModal")document.getElementById("editorModal").classList.remove("open")});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeLogin();}});
 
@@ -1184,6 +1269,7 @@ document.getElementById("endMonth").addEventListener("change",applyPeriod);
 document.querySelectorAll(".period-quick-btn").forEach(btn=>btn.addEventListener("click",()=>setQuickRange(btn.dataset.range)));
 fillPeriodSelectors();
 render();
+bootCloudSync();
 </script>
 </body>
 </html>
