@@ -123,6 +123,11 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.48);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal.open{display:flex}
 .modal-box{width:min(1180px,100%);max-height:92vh;overflow:auto;background:white;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.25);padding:20px}
 .modal-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.modal-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab{border:1px solid var(--line);background:#fff;padding:9px 12px;border-radius:10px;font-weight:700;font-size:12px}.tab.active{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.editor-user-line{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:9px 12px;border:1px solid #dbe7f5;border-radius:10px;background:#f8fbff;color:#344054;font-size:11px;font-weight:700}
+.editor-user-line .user-icon{font-size:14px;line-height:1}
+.editor-user-line strong{color:#1d4ed8;font-weight:850}
+html.dark .editor-user-line{background:#172033;border-color:#334155;color:#cbd5e1}
+html.dark .editor-user-line strong{color:#93c5fd}
 .editor-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.editor-grid>*{min-width:0}.editor-grid label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:700}.editor-grid input{width:100%;padding:9px;border:1px solid var(--line);border-radius:10px}
 .editor-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}.edit-table input{width:100px;padding:7px;border:1px solid var(--line);border-radius:8px;font-size:11px}.edit-table td:first-child input{width:110px}
 .toast{position:fixed;right:18px;bottom:18px;background:#101828;color:#fff;padding:12px 14px;border-radius:12px;font-size:12px;display:none;z-index:80;box-shadow:var(--shadow)}.toast.show{display:block}
@@ -398,6 +403,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
 <div id="editorModal" class="modal" aria-hidden="true">
   <div class="modal-box">
     <div class="modal-head"><div><div class="eyebrow">Base de dados</div><h2 style="margin:4px 0 0">Editar e alimentar o dashboard</h2></div><button class="btn ghost" id="closeEditor">Fechar</button></div>
+    <div id="loggedUserLine" class="editor-user-line" aria-live="polite"><span class="user-icon">👤</span><span>Usuário logado: <strong id="loggedUserName">—</strong></span></div>
     <div class="modal-tabs" id="editorTabs"></div>
     <div id="editorBody"></div>
     <div style="font-size:10px;color:#98a2b3;margin-right:auto;align-self:center">Sessão de edição protegida por usuário e senha.</div><div class="editor-actions">
@@ -1272,6 +1278,15 @@ if(supabaseClient){
   });
 }
 
+function updateLoggedUserLine(user){
+  const line=document.getElementById("loggedUserLine");
+  const name=document.getElementById("loggedUserName");
+  if(!line||!name) return;
+  const metadata=user?.user_metadata||{};
+  const displayName=metadata.name||metadata.full_name||metadata.fullName||user?.email||"Usuário autenticado";
+  name.textContent=displayName;
+  line.style.display="flex";
+}
 function isEditorAuthenticated(){
   if(!supabaseClient) return false;
   try{return sessionStorage.getItem("dashboard_edit_auth")==="1";}catch(e){return false;}
@@ -1282,6 +1297,7 @@ async function refreshEditorSession(){
     const {data}=await supabaseClient.auth.getSession();
     const ok=!!data.session;
     try{sessionStorage.setItem("dashboard_edit_auth",ok?"1":"0");}catch(e){}
+    if(ok && data.session?.user) updateLoggedUserLine(data.session.user);
     return ok;
   }catch(e){return false;}
 }
@@ -1324,6 +1340,7 @@ async function attemptLogin(){
     return;
   }
   try{sessionStorage.setItem("dashboard_edit_auth","1");}catch(e){}
+  updateLoggedUserLine(data.user);
   closeLogin();
   document.getElementById("editorModal").classList.add("open");
   renderEditor();
