@@ -403,7 +403,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
 <div id="editorModal" class="modal" aria-hidden="true">
   <div class="modal-box">
     <div class="modal-head"><div><div class="eyebrow">Base de dados</div><h2 style="margin:4px 0 0">Editar e alimentar o dashboard</h2></div><button class="btn ghost" id="closeEditor">Fechar</button></div>
-    <div id="loggedUserLine" class="editor-user-line" aria-live="polite"><span class="user-icon">👤</span><span>Usuário logado: <strong id="loggedUserName">—</strong></span></div>
+    <div id="loggedUserLine" class="editor-user-line" aria-live="polite"><span class="user-icon">👤</span><span>Usuário logado: <strong id="loggedUserName">—</strong></span><button type="button" class="btn danger" id="logoutEditor" style="margin-left:auto;padding:7px 10px;font-size:10px">Sair</button></div>
     <div class="modal-tabs" id="editorTabs"></div>
     <div id="editorBody"></div>
     <div style="font-size:10px;color:#98a2b3;margin-right:auto;align-self:center">Sessão de edição protegida por usuário e senha.</div><div class="editor-actions">
@@ -1287,6 +1287,20 @@ function updateLoggedUserLine(user){
   name.textContent=displayName;
   line.style.display="flex";
 }
+async function logoutEditor(){
+  if(!supabaseClient) return;
+  const {error}=await supabaseClient.auth.signOut({scope:"local"});
+  try{sessionStorage.setItem("dashboard_edit_auth","0");}catch(e){}
+  const line=document.getElementById("loggedUserLine");
+  if(line) line.style.display="none";
+  document.getElementById("editorModal")?.classList.remove("open");
+  if(error){
+    toast("Não foi possível sair da sessão.");
+  }else{
+    toast("Logoff realizado com sucesso.");
+  }
+}
+
 function isEditorAuthenticated(){
   if(!supabaseClient) return false;
   try{return sessionStorage.getItem("dashboard_edit_auth")==="1";}catch(e){return false;}
@@ -1375,6 +1389,7 @@ document.getElementById("loginModal").addEventListener("click",e=>{
   if(e.target.id==="loginModal") closeLogin();
 });
 
+document.getElementById("logoutEditor")?.addEventListener("click",logoutEditor);
 document.getElementById("closeEditor").addEventListener("click",()=>document.getElementById("editorModal").classList.remove("open"));
 document.getElementById("saveData").addEventListener("click",async()=>{
   const btn=document.getElementById("saveData");
