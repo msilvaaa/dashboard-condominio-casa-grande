@@ -468,22 +468,56 @@ async function persist(){
     return {ok:false,reason:"error",error};
   }
 }
+let cloudSyncTimer=null;
+let cloudSyncInFlight=false;
+let lastCloudUpdatedAt=null;
+
+async function refreshCloudData({silent=false} = {}){
+  if(!supabaseClient || cloudSyncInFlight) return {ok:false,reason:"not_configured"};
+  cloudSyncInFlight=true;
+  try{
+    const result=await loadCloudData();
+    if(result.ok && !result.empty){
+      const changed=!!(result.updated_at && result.updated_at!==lastCloudUpdatedAt);
+      lastCloudUpdatedAt=result.updated_at||lastCloudUpdatedAt;
+      syncInitialPeriod();
+      fillPeriodSelectors();
+      render();
+      if(!silent && changed) toast("Dados atualizados da nuvem.");
+    }
+    return result;
+  }finally{
+    cloudSyncInFlight=false;
+  }
+}
+
+function startCloudAutoRefresh(){
+  if(cloudSyncTimer) clearInterval(cloudSyncTimer);
+  cloudSyncTimer=setInterval(()=>refreshCloudData({silent:true}),60000);
+
+  document.addEventListener("visibilitychange",()=>{
+    if(document.visibilityState==="visible") refreshCloudData({silent:true});
+  });
+
+  window.addEventListener("focus",()=>{
+    refreshCloudData({silent:true});
+  });
+}
+
 async function bootCloudSync(){
   if(!supabaseClient){
     console.warn("Supabase ainda não configurado. Preencha SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY.");
     return;
   }
-  const result=await loadCloudData();
+  const result=await refreshCloudData();
   if(result.ok && !result.empty){
-    syncInitialPeriod();
-    fillPeriodSelectors();
-    render();
     toast("Dados sincronizados com a nuvem.");
   }else if(result.ok && result.empty){
     toast("Nuvem conectada. Os dados serão enviados ao salvar pela primeira vez.");
   }else{
     toast("Não foi possível carregar a nuvem. Os dados locais continuam disponíveis.");
   }
+  startCloudAutoRefresh();
 }
 function money(v){ const n=Number(v); return Number.isFinite(n)?n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}):"—"; }
 function compactMoney(v){
