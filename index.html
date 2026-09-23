@@ -134,6 +134,36 @@ html.dark .editor-user-line strong{color:#93c5fd}
 @media(max-width:1180px){.kpis{grid-template-columns:repeat(3,1fr)}.layout-main,.layout-2,.layout-3{grid-template-columns:1fr}}
 @media(max-width:700px){.wrap{padding:16px}.top{align-items:flex-start;flex-direction:column}h1{font-size:26px}.controls{justify-content:flex-start;width:100%}.period-stack{width:100%;align-items:stretch}.period-actions{align-self:flex-end}.period-stack .edit-data-btn{align-self:auto}.kpis{grid-template-columns:repeat(2,1fr)}.card{padding:15px}.insights{grid-template-columns:1fr}.editor-grid{grid-template-columns:1fr 1fr}}
 
+
+/* Correção de responsividade dos controles no celular */
+@media (max-width: 700px){
+  html,body{max-width:100%;overflow-x:hidden}
+  .wrap{width:100%;max-width:100%;padding:14px 12px}
+  .top{width:100%;max-width:100%;gap:14px}
+  .top>div:first-child{width:100%;min-width:0}
+  .controls{width:100%;max-width:100%;display:block}
+  .period-stack{width:100%;max-width:100%;align-items:stretch}
+  .period-filter{width:100%;min-width:0;max-width:100%;padding:10px}
+  .period-filter-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:end}
+  .period-filter-row label{min-width:0}
+  .period-select{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+  .period-arrow{padding-bottom:8px}
+  .period-quick{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .period-quick-btn{width:100%;min-width:0;padding:7px 4px;white-space:nowrap}
+  .period-actions{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px;gap:7px;align-items:stretch}
+  .period-actions .btn,
+  .period-actions .theme-toggle{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+  .period-actions .btn{padding-left:7px;padding-right:7px;font-size:10.5px}
+  .period-actions .theme-toggle{height:36px}
+}
+@media (max-width:380px){
+  .period-actions{grid-template-columns:1fr 1fr}
+  .period-actions .theme-toggle{grid-column:2;grid-row:1}
+  .period-actions .print-btn{grid-column:1;grid-row:1}
+  .period-actions .edit-data-btn{grid-column:1;grid-row:2}
+  .period-actions .theme-toggle{grid-column:2;grid-row:2}
+}
+
 /* Impressão / Salvar em PDF */
 .print-btn{white-space:nowrap}
 @media print{
