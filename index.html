@@ -132,7 +132,51 @@ html.dark .editor-user-line strong{color:#93c5fd}
 .editor-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}.edit-table input{width:100px;padding:7px;border:1px solid var(--line);border-radius:8px;font-size:11px}.edit-table td:first-child input{width:110px}
 .toast{position:fixed;right:18px;bottom:18px;background:#101828;color:#fff;padding:12px 14px;border-radius:12px;font-size:12px;display:none;z-index:80;box-shadow:var(--shadow)}.toast.show{display:block}
 @media(max-width:1180px){.kpis{grid-template-columns:repeat(3,1fr)}.layout-main,.layout-2,.layout-3{grid-template-columns:1fr}}
-@media(max-width:700px){.wrap{padding:16px}.top{align-items:flex-start;flex-direction:column}h1{font-size:26px}.controls{justify-content:flex-start;width:100%}.period-stack{width:100%;align-items:stretch}.period-actions{align-self:flex-end}.period-stack .edit-data-btn{align-self:auto}.kpis{grid-template-columns:repeat(2,1fr)}.card{padding:15px}.insights{grid-template-columns:1fr}.editor-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){
+  .wrap{width:100%;max-width:100%;padding:14px 12px;overflow:hidden}
+  .top{width:100%;max-width:100%;align-items:flex-start;flex-direction:column}
+  h1{font-size:26px}
+  .controls{justify-content:flex-start;width:100%;max-width:100%}
+  .period-stack{width:100%;max-width:100%;align-items:stretch}
+  .period-actions{align-self:stretch}
+  .period-stack .edit-data-btn{align-self:auto}
+  .kpis{
+    width:100%;
+    max-width:100%;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    min-width:0;
+  }
+  .kpi{
+    min-width:0;
+    width:100%;
+    max-width:100%;
+    overflow:hidden;
+  }
+  .kpi .label{
+    min-width:0;
+    width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .kpi .value{
+    min-width:0;
+    width:100%;
+    max-width:100%;
+    font-size:20px;
+    line-height:1.05;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .kpi .meta{min-width:0;width:100%}
+  .card{min-width:0;max-width:100%;overflow:hidden;padding:15px}
+  .layout-main,.layout-2,.layout-3{width:100%;max-width:100%;min-width:0}
+  .layout-main>*,.layout-2>*,.layout-3>*{min-width:0;max-width:100%}
+  .insights{grid-template-columns:1fr}
+  .editor-grid{grid-template-columns:1fr 1fr}
+}
 
 
 /* Correção de responsividade dos controles no celular */
