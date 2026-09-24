@@ -83,11 +83,14 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .saldo-devedor-summary .chart-summary-stat:last-child{background:#eff6ff;border-radius:9px;margin-left:8px;border-left:0;padding-left:14px}
 .saldo-devedor-summary .chart-summary-stat:last-child span{color:#2563eb}
 .saldo-devedor-summary .chart-summary-stat:last-child b{font-size:14px;color:#1d4ed8;font-weight:900}
-/* Saldo atual no resumo do saldo devedor */
-.saldo-devedor-summary .chart-summary-grid{display:block}
-.saldo-devedor-summary .saldo-atual-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 16px;border-color:#dbe4f0;background:linear-gradient(135deg,#ffffff 0%,#f7faff 100%);box-shadow:0 2px 8px rgba(16,24,40,.05)}
-.saldo-devedor-summary .saldo-atual-label{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#667085;font-weight:900}
-.saldo-devedor-summary .saldo-atual-value{font-size:16px;font-weight:900;color:#1d4ed8;background:#eff6ff;border-radius:9px;padding:8px 14px;white-space:nowrap}
+/* Métricas centralizadas do resumo do saldo devedor */
+.saldo-devedor-summary .saldo-metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.saldo-devedor-summary .saldo-metric-card{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:64px;padding:10px 8px;border-color:#dbe4f0;background:linear-gradient(180deg,#ffffff 0%,#f7faff 100%);box-shadow:0 2px 8px rgba(16,24,40,.05)}
+.saldo-devedor-summary .saldo-metric-card span{font-size:8.5px;text-transform:uppercase;letter-spacing:.045em;color:#667085;font-weight:800;margin-bottom:5px}
+.saldo-devedor-summary .saldo-metric-card b{font-size:11px;color:#172033;font-weight:900;white-space:nowrap}
+@media(max-width:900px){
+  .saldo-devedor-summary .saldo-metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @media(max-width:700px){.saldo-devedor-summary .saldo-atual-card{padding:11px 12px}.saldo-devedor-summary .saldo-atual-value{font-size:14px;padding:7px 10px}}
 @media(max-width:900px){
   .saldo-devedor-summary .chart-summary-card{grid-template-columns:1fr 1fr;gap:0;padding:12px}
@@ -1139,13 +1142,17 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
   if(!rows || !rows.length){ box.innerHTML=""; return; }
 
   if(extraClass.includes("saldo-devedor-summary")){
-    const saldoAtual=num(rows.at(-1)[1]);
+    const values=rows.map(r=>num(r[1]));
+    const avg=values.reduce((a,b)=>a+b,0)/values.length;
+    const max=Math.max(...values), min=Math.min(...values), last=values.at(-1);
     box.className=("chart-summary "+extraClass).trim();
     box.innerHTML='<div class="chart-summary-title">'+esc(title || "Resumo do gráfico")+'</div>'+
-      '<div class="chart-summary-grid"><div class="chart-summary-card saldo-atual-card">'+
-        '<div class="saldo-atual-label">Saldo atual</div>'+
-        '<div class="saldo-atual-value">'+money(saldoAtual)+'</div>'+
-      '</div></div>';
+      '<div class="chart-summary-grid saldo-metrics-grid">'+
+        '<div class="chart-summary-card saldo-metric-card"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
+        '<div class="chart-summary-card saldo-metric-card"><span>Maior valor</span><b>'+money(max)+'</b></div>'+
+        '<div class="chart-summary-card saldo-metric-card"><span>Menor valor</span><b>'+money(min)+'</b></div>'+
+        '<div class="chart-summary-card saldo-metric-card"><span>Último mês</span><b>'+money(last)+'</b></div>'+
+      '</div>';
     return;
   }
 
