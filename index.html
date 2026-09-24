@@ -316,6 +316,21 @@ html.dark svg [fill="#667085"],html.dark svg [fill="#475467"],html.dark svg [fil
 html.dark svg [fill="#172033"]{fill:#e5e7eb !important}
 html.dark svg [fill="#ffffff"]{fill:#111827 !important}
 
+
+/* Mobile KPI: valores extensos permanecem dentro do card */
+@media (max-width:700px){
+  .kpi .value{
+    font-size:clamp(15px,5.1vw,20px);
+    letter-spacing:-.045em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:clip;
+    padding:0 2px;
+    min-width:0;
+    width:100%;
+  }
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
