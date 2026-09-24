@@ -43,20 +43,18 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .chart-summary-stat b{color:#172033;font-weight:850;text-align:right;white-space:nowrap;font-size:10.5px}
 .chart-summary-stat:last-child b{color:#1d4ed8}
  .homero-total-summary .chart-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.homero-total-summary .chart-summary-card{padding:12px 14px}.homero-total-summary .chart-summary-series{font-size:10.5px;margin-bottom:8px}.homero-total-summary .chart-summary-total{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:10px;color:#667085}.homero-total-summary .chart-summary-total b{font-size:14px;color:#172033;font-weight:900;white-space:nowrap}.homero-total-summary .difference-card{border-color:#f0d7a0;background:linear-gradient(180deg,#fffdf7 0%,#fffaf0 100%)}.homero-total-summary .difference-card .chart-summary-total b{color:#b45309}.homero-total-summary .saldo-red{border-color:#fecaca;background:linear-gradient(180deg,#fff7f7 0%,#fff1f2 100%)}.homero-total-summary .saldo-red .chart-summary-total b{color:#dc2626}.homero-total-summary .saldo-green{border-color:#bbf7d0;background:linear-gradient(180deg,#f6fff9 0%,#ecfdf3 100%)}.homero-total-summary .saldo-green .chart-summary-total b{color:#16a34a}
-/* Resumo das despesas postais — mesmo padrão do resumo do gráfico */
+/* Resumo das despesas postais — mesmo layout do Resumo do gráfico */
 .chart-summary.postal-summary{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
-.postal-summary .chart-summary-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#667085;margin-bottom:9px;display:block;padding:0}
-.postal-summary .chart-summary-title::before{display:none}
+.postal-summary .chart-summary-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#667085;margin-bottom:9px}
 .postal-summary .chart-summary-grid{display:grid;grid-template-columns:1fr;gap:8px}
-.postal-summary .chart-summary-card{display:grid;grid-template-columns:1fr;min-width:0;border:1px solid #e4e9f0;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);border-radius:12px;padding:10px 11px;box-shadow:none}
-.postal-summary .chart-summary-series{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:850;color:#344054;margin-bottom:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0}
+.postal-summary .chart-summary-card{border:1px solid #e4e9f0;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);border-radius:12px;padding:10px 11px;min-width:0;box-shadow:none;display:grid;grid-template-columns:1fr}
+.postal-summary .chart-summary-series{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:850;color:#344054;margin-bottom:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .postal-summary .chart-summary-dot{width:8px;height:8px;border-radius:50%;flex:none}
-.postal-summary .chart-summary-stat{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0;border-top:1px solid #eef2f6;font-size:9.5px;line-height:1.35;min-height:0;white-space:normal}
+.postal-summary .chart-summary-stat{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0;border-top:1px solid #eef2f6;font-size:9.5px;line-height:1.35}
 .postal-summary .chart-summary-stat:first-of-type{border-top:0}
 .postal-summary .chart-summary-stat span{color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .postal-summary .chart-summary-stat b{max-width:58%;overflow:hidden;text-overflow:ellipsis;color:#172033;font-weight:850;text-align:right;white-space:nowrap;font-size:10.5px}
 .postal-summary .chart-summary-stat:last-child b{color:#1d4ed8}
-@media(max-width:1180px){.postal-summary .chart-summary-grid{grid-template-columns:1fr}}
 /* Resumo especial do saldo devedor */
 .chart-summary.saldo-devedor-summary{margin-top:12px;padding:0;border-top:0}
 .saldo-devedor-summary .chart-summary-title{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:0 2px;font-size:10px}
