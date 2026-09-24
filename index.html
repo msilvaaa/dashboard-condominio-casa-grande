@@ -1214,7 +1214,7 @@ function render(){
   const postalRows=filtered(state.data.postal);
   barChart("postalChart",postalRows,[1],["Despesas postais (correios)"],["#dc2626"]);
   renderChartSummary("postalSummary",postalRows,[
-    {col:1,label:"Despesas postais (correios)",color:"#dc2626"}
+    {col:1,label:"Despesas postais",color:"#dc2626"}
   ],"Resumo das despesas postais","postal-summary");
 
   const homeroRows=filtered(state.data.homero);
