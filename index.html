@@ -43,6 +43,32 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .chart-summary-stat b{color:#172033;font-weight:850;text-align:right;white-space:nowrap;font-size:10.5px}
 .chart-summary-stat:last-child b{color:#1d4ed8}
  .homero-total-summary .chart-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.homero-total-summary .chart-summary-card{padding:12px 14px}.homero-total-summary .chart-summary-series{font-size:10.5px;margin-bottom:8px}.homero-total-summary .chart-summary-total{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:10px;color:#667085}.homero-total-summary .chart-summary-total b{font-size:14px;color:#172033;font-weight:900;white-space:nowrap}.homero-total-summary .difference-card{border-color:#f0d7a0;background:linear-gradient(180deg,#fffdf7 0%,#fffaf0 100%)}.homero-total-summary .difference-card .chart-summary-total b{color:#b45309}.homero-total-summary .saldo-red{border-color:#fecaca;background:linear-gradient(180deg,#fff7f7 0%,#fff1f2 100%)}.homero-total-summary .saldo-red .chart-summary-total b{color:#dc2626}.homero-total-summary .saldo-green{border-color:#bbf7d0;background:linear-gradient(180deg,#f6fff9 0%,#ecfdf3 100%)}.homero-total-summary .saldo-green .chart-summary-total b{color:#16a34a}
+/* Resumo especial das despesas postais */
+.chart-summary.postal-summary{margin-top:12px;padding:0;border-top:0}
+.postal-summary .chart-summary-title{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:0 2px;font-size:10px}
+.postal-summary .chart-summary-title::before{content:"";width:4px;height:16px;border-radius:4px;background:#dc2626}
+.postal-summary .chart-summary-grid{display:block}
+.postal-summary .chart-summary-card{display:grid;grid-template-columns:minmax(210px,1.35fr) repeat(4,minmax(110px,1fr));align-items:center;gap:0;padding:13px 16px;border-color:#f0d9dc;background:linear-gradient(135deg,#ffffff 0%,#fff8f8 100%);box-shadow:0 2px 8px rgba(16,24,40,.05)}
+.postal-summary .chart-summary-series{margin:0;padding-right:18px;font-size:11px;color:#1d2939}
+.postal-summary .chart-summary-dot{width:9px;height:9px}
+.postal-summary .chart-summary-stat{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:2px 14px;border-top:0;border-left:1px solid #f1e2e4;min-height:42px}
+.postal-summary .chart-summary-stat span{font-size:8.5px;text-transform:uppercase;letter-spacing:.045em;color:#667085;font-weight:800}
+.postal-summary .chart-summary-stat b{max-width:100%;font-size:11px;color:#172033}
+.postal-summary .chart-summary-stat:last-child{background:#fff1f2;border-radius:9px;margin-left:8px;border-left:0;padding-left:14px}
+.postal-summary .chart-summary-stat:last-child span{color:#dc2626}
+.postal-summary .chart-summary-stat:last-child b{font-size:14px;color:#b91c1c;font-weight:900}
+@media(max-width:900px){
+  .postal-summary .chart-summary-card{grid-template-columns:1fr 1fr;gap:0;padding:12px}
+  .postal-summary .chart-summary-series{grid-column:1/-1;padding:0 0 10px;margin-bottom:2px;border-bottom:1px solid #f1e2e4}
+  .postal-summary .chart-summary-stat{border-left:0;border-top:1px solid #f1e2e4;padding:9px 8px;min-height:48px}
+  .postal-summary .chart-summary-stat:nth-of-type(odd){border-right:1px solid #f1e2e4}
+  .postal-summary .chart-summary-stat:last-child{margin:8px 0 0;padding-left:10px;border-radius:8px}
+}
+@media(max-width:700px){
+  .postal-summary .chart-summary-card{grid-template-columns:1fr 1fr}
+  .postal-summary .chart-summary-stat b{font-size:10px}
+  .postal-summary .chart-summary-stat:last-child b{font-size:13px}
+}
 /* Resumo especial do saldo devedor */
 .chart-summary.saldo-devedor-summary{margin-top:12px;padding:0;border-top:0}
 .saldo-devedor-summary .chart-summary-title{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:0 2px;font-size:10px}
@@ -1189,7 +1215,7 @@ function render(){
   barChart("postalChart",postalRows,[1],["Despesas postais (correios)"],["#dc2626"]);
   renderChartSummary("postalSummary",postalRows,[
     {col:1,label:"Despesas postais (correios)",color:"#dc2626"}
-  ],"Resumo","single-series");
+  ],"Resumo das despesas postais","postal-summary");
 
   const homeroRows=filtered(state.data.homero);
   barChart("homeroChart",homeroRows,[1,2],["Adiantamentos","Prestação de contas"],["#7c3aed","#16a34a"]);
