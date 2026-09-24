@@ -676,6 +676,16 @@ function compactMoney(v){
 function num(v){ const n=Number(v); return Number.isFinite(n)?n:0; }
 function fmtMonth(s){ const [y,m]=s.split("-"); const names=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]; return names[Number(m)-1]+"/"+y.slice(2); }
 function filtered(rows){ return rows.filter(r=>r[0]>=state.start && r[0]<=state.end); }
+
+function withSaldoEvolution(rows){
+  return rows.map((r,i)=>{
+    const current=Math.abs(num(r[1]));
+    const previous=i>0 ? Math.abs(num(rows[i-1][1])) : 0;
+    const copy=[...r];
+    copy[6]=i===0 ? current : previous+current;
+    return copy;
+  });
+}
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
 function tooltipForChart(id){
@@ -998,7 +1008,7 @@ function openChartModal(chartId,title){
   const host=document.getElementById("chartModalChart");
   if(!modal||!host) return;
   let rows=[],cols=[],labels=[],colors=[],chartHtml='';
-  if(chartId==="saldoChart"){ rows=filtered(state.data.main); cols=[1]; labels=["Saldo devedor"]; colors=["#2563eb"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
+  if(chartId==="saldoChart"){ rows=withSaldoEvolution(filtered(state.data.main)); cols=[1]; labels=["Saldo devedor"]; colors=["#2563eb"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
   }else if(chartId==="receitaChart"){ rows=filtered(state.data.main); cols=[4,2]; labels=["Arrecadação","Condomínio"]; colors=["#16a34a","#64748b"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
   }else if(chartId==="fundoChart"){ rows=filtered(state.data.main); cols=[3,5]; labels=["Fundo reserva","Garagem"]; colors=["#7c3aed","#d97706"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
   }else if(chartId==="utilitiesChart"){ rows=filtered(state.data.utilities); cols=[1,2]; labels=["Águas do Rio","Light"]; colors=["#0ea5e9","#f59e0b"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
