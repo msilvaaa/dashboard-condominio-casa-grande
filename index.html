@@ -1088,6 +1088,7 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
         <div class="chart-summary-stat"><span>Maior valor</span><b>${money(max)}</b></div>
         <div class="chart-summary-stat"><span>Menor valor</span><b>${money(min)}</b></div>
         <div class="chart-summary-stat"><span>Último mês</span><b>${money(last)}</b></div>
+        <div class="chart-summary-stat"><span>Total</span><b>${money(values.reduce((a,b)=>a+b,0))}</b></div>
       </div>`;
   }).join("");
 
