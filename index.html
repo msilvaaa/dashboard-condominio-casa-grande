@@ -51,7 +51,7 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .postal-summary .chart-summary-card{display:grid;grid-template-columns:minmax(210px,1.35fr) repeat(4,minmax(110px,1fr));align-items:center;gap:0;padding:13px 16px;border-color:#f0d9dc;background:linear-gradient(135deg,#ffffff 0%,#fff8f8 100%);box-shadow:0 2px 8px rgba(16,24,40,.05)}
 .postal-summary .chart-summary-series{margin:0;padding-right:18px;font-size:11px;color:#1d2939}
 .postal-summary .chart-summary-dot{width:9px;height:9px}
-.postal-summary .chart-summary-stat{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:2px 14px;border-top:0;border-left:1px solid #f1e2e4;min-height:42px}
+.postal-summary .chart-summary-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;padding:2px 14px;border-top:0;border-left:1px solid #f1e2e4;min-height:42px}
 .postal-summary .chart-summary-stat span{font-size:8.5px;text-transform:uppercase;letter-spacing:.045em;color:#667085;font-weight:800}
 .postal-summary .chart-summary-stat b{max-width:100%;font-size:11px;color:#172033}
 .postal-summary .chart-summary-stat:last-child{background:#fff1f2;border-radius:9px;margin-left:8px;border-left:0;padding-left:14px}
@@ -128,6 +128,10 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 @media(max-width:700px){.saldo-devedor-summary .saldo-atual-card{padding:11px 12px}.saldo-devedor-summary .saldo-atual-value{font-size:14px;padding:7px 10px}}
 @media(max-width:900px){
   .saldo-devedor-summary .chart-summary-card{grid-template-columns:1fr 1fr;gap:0;padding:12px}
+  .saldo-devedor-summary .saldo-summary-card{grid-template-columns:1fr 1fr;gap:0;padding:12px}
+  .saldo-devedor-summary .saldo-summary-card .saldo-atual-summary{grid-column:1/-1;padding:0 0 10px;margin-bottom:2px;border-bottom:1px solid #e7edf5}
+  .saldo-devedor-summary .saldo-summary-card>.chart-summary-stat{border-left:0;border-top:1px solid #e7edf5;padding:9px 8px;min-height:48px}
+  .saldo-devedor-summary .saldo-summary-card>.total-stat{margin:8px 0 0;padding-left:10px;border-radius:8px}
   .saldo-devedor-summary .chart-summary-series{grid-column:1/-1;padding:0 0 10px;margin-bottom:2px;border-bottom:1px solid #e7edf5}
   .saldo-devedor-summary .chart-summary-stat{border-left:0;border-top:1px solid #e7edf5;padding:9px 8px;min-height:48px}
   .saldo-devedor-summary .chart-summary-stat:nth-of-type(odd){border-right:1px solid #e7edf5}
