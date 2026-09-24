@@ -84,6 +84,18 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .saldo-devedor-summary .chart-summary-stat:last-child span{color:#2563eb}
 .saldo-devedor-summary .chart-summary-stat:last-child b{font-size:14px;color:#1d4ed8;font-weight:900}
 /* Resumo do saldo devedor seguindo o Saldo Atual */
+.saldo-devedor-summary .saldo-devedor-extra-grid{display:block}
+.saldo-devedor-summary .saldo-summary-card{display:grid;grid-template-columns:minmax(170px,1.25fr) repeat(5,minmax(100px,1fr));align-items:center;gap:0;padding:13px 16px;border-color:#dbe4f0;background:linear-gradient(135deg,#ffffff 0%,#f7faff 100%);box-shadow:0 2px 8px rgba(16,24,40,.05)}
+.saldo-devedor-summary .saldo-atual-summary{padding:0 16px 0 0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.saldo-devedor-summary .saldo-summary-card>.chart-summary-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;padding:2px 10px;border-top:0;border-left:1px solid #e7edf5;min-height:42px}
+.saldo-devedor-summary .saldo-summary-card>.chart-summary-stat span{text-align:center}
+.saldo-devedor-summary .saldo-summary-card>.total-stat{background:#eff6ff;border-radius:9px;margin-left:8px;border-left:0}
+.saldo-devedor-summary .saldo-summary-card>.total-stat span{color:#2563eb}
+.saldo-devedor-summary .saldo-summary-card>.total-stat b{font-size:14px;color:#1d4ed8;font-weight:900}
+.saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-label,.saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-value,.saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-badge{display:block;text-align:center}
+.saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-label{font-size:10px;font-weight:800;color:#667085;margin-bottom:6px}
+.saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-value{font-size:22px;line-height:1.15;font-weight:900;color:#172033;white-space:nowrap}
+.saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-badge{width:max-content;margin:8px auto 0;padding:5px 12px;border-radius:999px;font-size:10px;font-weight:900;text-transform:lowercase}
 .saldo-devedor-summary .saldo-atual-summary{
   display:flex;flex-direction:column;align-items:flex-start;
   padding:14px 16px;border:1px solid #dbe4f0;border-radius:12px;
@@ -1173,17 +1185,19 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
     const total=values.reduce((a,b)=>a+b,0);
     box.className=("chart-summary "+extraClass).trim();
     box.innerHTML='<div class="chart-summary-title">'+esc(title || "Resumo do gráfico")+'</div>'+
-      '<div class="saldo-atual-summary">'+
-        '<div class="saldo-atual-summary-label">Saldo atual</div>'+
-        '<div class="saldo-atual-summary-value">'+money(saldoAtual)+'</div>'+
-        '<div class="saldo-atual-summary-badge '+classe+'">'+status+'</div>'+
-      '</div>'+ 
       '<div class="chart-summary-grid saldo-devedor-extra-grid">'+
-        '<div class="chart-summary-stat"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
-        '<div class="chart-summary-stat"><span>Maior valor</span><b>'+money(max)+'</b></div>'+
-        '<div class="chart-summary-stat"><span>Menor valor</span><b>'+money(min)+'</b></div>'+ 
-        '<div class="chart-summary-stat"><span>Último mês</span><b>'+money(last)+'</b></div>'+ 
-        '<div class="chart-summary-stat"><span>Total</span><b>'+money(total)+'</b></div>'+ 
+        '<div class="chart-summary-card saldo-summary-card">'+
+          '<div class="saldo-atual-summary">'+
+            '<div class="saldo-atual-summary-label">Saldo atual</div>'+
+            '<div class="saldo-atual-summary-value">'+money(saldoAtual)+'</div>'+
+            '<div class="saldo-atual-summary-badge '+classe+'">'+status+'</div>'+
+          '</div>'+
+          '<div class="chart-summary-stat"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
+          '<div class="chart-summary-stat"><span>Maior valor</span><b>'+money(max)+'</b></div>'+
+          '<div class="chart-summary-stat"><span>Menor valor</span><b>'+money(min)+'</b></div>'+
+          '<div class="chart-summary-stat"><span>Último mês</span><b>'+money(last)+'</b></div>'+
+          '<div class="chart-summary-stat total-stat"><span>Total</span><b>'+money(total)+'</b></div>'+
+        '</div>'+
       '</div>';
     return;
   }
