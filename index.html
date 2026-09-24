@@ -83,6 +83,12 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .saldo-devedor-summary .chart-summary-stat:last-child{background:#eff6ff;border-radius:9px;margin-left:8px;border-left:0;padding-left:14px}
 .saldo-devedor-summary .chart-summary-stat:last-child span{color:#2563eb}
 .saldo-devedor-summary .chart-summary-stat:last-child b{font-size:14px;color:#1d4ed8;font-weight:900}
+/* Saldo atual no resumo do saldo devedor */
+.saldo-devedor-summary .chart-summary-grid{display:block}
+.saldo-devedor-summary .saldo-atual-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 16px;border-color:#dbe4f0;background:linear-gradient(135deg,#ffffff 0%,#f7faff 100%);box-shadow:0 2px 8px rgba(16,24,40,.05)}
+.saldo-devedor-summary .saldo-atual-label{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#667085;font-weight:900}
+.saldo-devedor-summary .saldo-atual-value{font-size:16px;font-weight:900;color:#1d4ed8;background:#eff6ff;border-radius:9px;padding:8px 14px;white-space:nowrap}
+@media(max-width:700px){.saldo-devedor-summary .saldo-atual-card{padding:11px 12px}.saldo-devedor-summary .saldo-atual-value{font-size:14px;padding:7px 10px}}
 @media(max-width:900px){
   .saldo-devedor-summary .chart-summary-card{grid-template-columns:1fr 1fr;gap:0;padding:12px}
   .saldo-devedor-summary .chart-summary-series{grid-column:1/-1;padding:0 0 10px;margin-bottom:2px;border-bottom:1px solid #e7edf5}
@@ -442,7 +448,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
     <section class="card">
       <div class="title-row"><div><div class="title">Evolução do saldo devedor</div><div class="tiny">Linha mensal com destaque para pontos de virada</div></div><span id="saldoBadge" class="badge blue">—</span></div>
       <div class="chart-wrap chart-area"><div id="saldoTip" class="chart-tooltip"></div><svg id="saldoChart" viewBox="0 0 920 350" aria-label="Gráfico do saldo devedor"></svg></div><div id="saldoSummary" class="chart-summary"></div>
-      <div class="legend"><span><i class="dot" style="background:#2563eb"></i>Saldo devedor</span></div>
+      
     </section>
     <section class="card">
       <div class="title-row"><div><div class="title">Arrecadação × despesas</div><div class="tiny">Comparação mensal</div></div></div>
@@ -1130,8 +1136,16 @@ function bindChartClicks(){
 function renderChartSummary(containerId, rows, series, title, extraClass=""){
   const box=document.getElementById(containerId);
   if(!box)return;
-  if(!rows || !rows.length){
-    box.innerHTML="";
+  if(!rows || !rows.length){ box.innerHTML=""; return; }
+
+  if(extraClass.includes("saldo-devedor-summary")){
+    const saldoAtual=num(rows.at(-1)[1]);
+    box.className=("chart-summary "+extraClass).trim();
+    box.innerHTML='<div class="chart-summary-title">'+esc(title || "Resumo do gráfico")+'</div>'+
+      '<div class="chart-summary-grid"><div class="chart-summary-card saldo-atual-card">'+
+        '<div class="saldo-atual-label">Saldo atual</div>'+
+        '<div class="saldo-atual-value">'+money(saldoAtual)+'</div>'+
+      '</div></div>';
     return;
   }
 
@@ -1139,28 +1153,18 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
     const values=rows.map(r=>num(r[item.col]));
     const avg=values.reduce((a,b)=>a+b,0)/values.length;
     const max=Math.max(...values), min=Math.min(...values), last=values.at(-1);
-    const isSaldo=extraClass.includes("saldo-devedor-summary");
-    const totalLabel=isSaldo?"Saldo atual":"Total";
-    const totalValue=isSaldo?last:values.reduce((a,b)=>a+b,0);
-
-    return `
-      <div class="chart-summary-card">
-        <div class="chart-summary-series" title="${esc(item.label)}">
-          <span class="chart-summary-dot" style="background:${item.color}"></span>
-          <span>${esc(item.label)}</span>
-        </div>
-        <div class="chart-summary-stat"><span>Média mensal</span><b>${money(avg)}</b></div>
-        <div class="chart-summary-stat"><span>Maior valor</span><b>${money(max)}</b></div>
-        <div class="chart-summary-stat"><span>Menor valor</span><b>${money(min)}</b></div>
-        <div class="chart-summary-stat"><span>Último mês</span><b>${money(last)}</b></div>
-        <div class="chart-summary-stat"><span>${totalLabel}</span><b>${money(totalValue)}</b></div>
-      </div>`;
+    return '<div class="chart-summary-card">'+
+      '<div class="chart-summary-series" title="'+esc(item.label)+'"><span class="chart-summary-dot" style="background:'+item.color+'"></span><span>'+esc(item.label)+'</span></div>'+
+      '<div class="chart-summary-stat"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
+      '<div class="chart-summary-stat"><span>Maior valor</span><b>'+money(max)+'</b></div>'+
+      '<div class="chart-summary-stat"><span>Menor valor</span><b>'+money(min)+'</b></div>'+
+      '<div class="chart-summary-stat"><span>Último mês</span><b>'+money(last)+'</b></div>'+
+      '<div class="chart-summary-stat"><span>Total</span><b>'+money(values.reduce((a,b)=>a+b,0))+'</b></div>'+
+    '</div>';
   }).join("");
-
-  box.className=`chart-summary ${extraClass}`.trim();
-  box.innerHTML=
-    `<div class="chart-summary-title">${esc(title || "Resumo do gráfico")}</div>`+
-    `<div class="chart-summary-grid">${cards}</div>`;
+  box.className=("chart-summary "+extraClass).trim();
+  box.innerHTML='<div class="chart-summary-title">'+esc(title || "Resumo do gráfico")+'</div>'+
+    '<div class="chart-summary-grid">'+cards+'</div>';
 }
 
 function renderHomeroSummary(rows){
