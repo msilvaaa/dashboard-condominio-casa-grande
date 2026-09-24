@@ -1167,12 +1167,23 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
     const saldoAtual=num(rows.at(-1)[1]);
     const classe=saldoAtual>=0?"positivo":"negativo";
     const status=saldoAtual>=0?"positivo":"negativo";
+    const values=rows.map(r=>num(r[1]));
+    const avg=values.reduce((a,b)=>a+b,0)/values.length;
+    const max=Math.max(...values), min=Math.min(...values), last=values.at(-1);
+    const total=values.reduce((a,b)=>a+b,0);
     box.className=("chart-summary "+extraClass).trim();
     box.innerHTML='<div class="chart-summary-title">'+esc(title || "Resumo do gráfico")+'</div>'+
       '<div class="saldo-atual-summary">'+
         '<div class="saldo-atual-summary-label">Saldo atual</div>'+
         '<div class="saldo-atual-summary-value">'+money(saldoAtual)+'</div>'+
         '<div class="saldo-atual-summary-badge '+classe+'">'+status+'</div>'+
+      '</div>'+ 
+      '<div class="chart-summary-grid saldo-devedor-extra-grid">'+
+        '<div class="chart-summary-stat"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
+        '<div class="chart-summary-stat"><span>Maior valor</span><b>'+money(max)+'</b></div>'+
+        '<div class="chart-summary-stat"><span>Menor valor</span><b>'+money(min)+'</b></div>'+ 
+        '<div class="chart-summary-stat"><span>Último mês</span><b>'+money(last)+'</b></div>'+ 
+        '<div class="chart-summary-stat"><span>Total</span><b>'+money(total)+'</b></div>'+ 
       '</div>';
     return;
   }
