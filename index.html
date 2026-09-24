@@ -497,6 +497,13 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
       <div id="insights" class="insights"></div>
     </section>
   </div>
+  
+  <section class="card" style="margin-top:16px">
+    <div class="title-row"><div><div class="title">Poupança Casa Grande</div><div class="tiny">Evolução mensal da poupança no período selecionado</div></div></div>
+    <div class="chart-wrap chart-area"><div id="poupancaTip" class="chart-tooltip"></div><svg id="poupancaChart" viewBox="0 0 920 320" aria-label="Gráfico da Poupança Casa Grande"></svg></div>
+    <div id="poupancaSummary" class="chart-summary"></div>
+    <div class="legend"><span><i class="dot" style="background:#16a34a"></i>Poupança Casa Grande</span></div>
+  </section>
 
   <div class="grid layout-2" style="margin-top:16px">
     <section class="card"><div class="title-row"><div><div class="title">Águas do Rio × Light</div><div class="tiny">Valores e resumo do período selecionado</div></div></div><div class="chart-wrap chart-area"><div id="utilitiesTip" class="chart-tooltip"></div><svg id="utilitiesChart" viewBox="0 0 560 280"></svg></div><div id="utilitiesSummary" class="chart-summary"></div></section>
@@ -598,7 +605,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
-const ORIGINAL = {"main": [["2025-01", "-68498.96", "200782.77", "9444.40", "207440.77", "6658.00", "-"], ["2025-02", "-4646.84", "167006.92", "9075.00", "173009.92", "6003.00", "63852.12"], ["2025-03", "-17959.11", "108157.87", "9075.00", "114150.87", "5993.00", "-13312.27"], ["2025-04", "-25154.32", "95228.50", "9000.00", "100488.50", "5260.00", "-7195.21"], ["2025-05", "-22027.73", "124255.45", "8925.00", "129505.45", "5250.00", "3126.59"], ["2025-06", "-50881.28", "95556.95", "9000.00", "101066.95", "5510.00", "-28853.55"], ["2025-07", "-48736.82", "115102.64", "10611.93", "120872.64", "5770.00", "2144.46"], ["2025-08", "-56514.92", "102640.73", "9179.67", "107895.73", "5255.00", "-7778.10"], ["2025-09", "-77192.17", "101295.00", "9297.20", "106810.00", "5515.00", "-20677.25"], ["2025-10", "7300.37", "206918.81", "9750.00", "212168.81", "5250.00", "84492.54"], ["2025-11", "-28566.58", "112918.05", "9672.20", "118428.05", "5510.00", "-35866.95"], ["2025-12", "-41195.41", "142967.64", "9825.00", "148482.64", "5515.00", "-12628.83"], ["2026-01", "-62549.59", "106043.62", "9372.20", "111463.62", "5420.00", "-21354.18"], ["2026-02", "-83119.88", "100891.47", "8925.00", "105816.47", "4925.00", "-20570.29"], ["2026-03", "-109118.32", "99678.90", "9375.00", "105127.30", "5448.40", "-25998.44"], ["2026-04", "-120926.53", "101962.13", "9000.00", "107392.13", "5430.00", "-11808.21"], ["2026-05", "-154046.58", "94164.70", "9075.00", "99603.10", "5438.40", "-33120.05"], ["2026-06", "-158309.90", "100993.00", "9525.00", "106668.00", "5675.00", "-4263.32"], ["2026-07", "-800.87", "96201.62", "9450.00", "101126.62", "4925.00", "157509.03"], ["2026-08", "-2261.55", "101161.94", "0", "106841.94", "5680.00", "-1460.68"]], "utilities": [["2025-04", "23905.98", "3159.65"], ["2025-05", "23905.98", "3030.39"], ["2025-06", "23905.98", "3244.48"], ["2025-07", "23905.98", "3222.87"], ["2025-08", "23905.98", "3068.20"], ["2025-09", "23905.98", "3465.47"], ["2025-10", "23905.98", "3293.90"], ["2025-11", "23905.98", "3891.06"], ["2025-12", "24710.72", "3270.87"], ["2026-01", "26239.72", "2950.14"], ["2026-02", "26239.57", "3509.19"], ["2026-03", "26239.72", "3696.50"], ["2026-04", "26239.72", "3680.51"], ["2026-05", "26239.72", "3990.88"], ["2026-06", "26239.72", "3748.74"], ["2026-07", "26239.72", "4115.97"], ["2026-08", "26006.61", "4326.38"]], "postal": [["2025-01", "0"], ["2025-02", "0"], ["2025-03", "0"], ["2025-04", "0"], ["2025-05", "0"], ["2025-06", "0"], ["2025-07", "0"], ["2025-08", "667.70"], ["2025-09", "603.10"], ["2025-10", "140.60"], ["2025-11", "492.35"], ["2025-12", "279.90"], ["2026-01", "386.30"], ["2026-02", "505.15"], ["2026-03", "245.75"], ["2026-04", "400.50"], ["2026-05", "154.00"], ["2026-06", "708.00"], ["2026-07", "750.60"], ["2026-08", "273.05"]], "homero": [["2025-08", "1000", "0"], ["2025-09", "1000", "1072.68"], ["2025-10", "3230", "1933.88"], ["2025-11", "1000", "2377.12"], ["2025-12", "5800", "5626.45"], ["2026-01", "1000", "1035.61"], ["2026-02", "1000", "1133.99"], ["2026-03", "2000", "966.44"], ["2026-04", "1000", "0"], ["2026-05", "1000", "1982.43"], ["2026-06", "1000", "0"], ["2026-07", "1000", "2262.89"], ["2026-08", "1000", "776.27"], ["2026-09", "1000", "820.40"]], "internetGas": [["2025-04", "116.59", "69.56"], ["2025-05", "113.20", "69.92"], ["2025-06", "109.99", "70.18"], ["2025-07", "113.20", "70.18"], ["2025-08", "109.99", "69.71"], ["2025-09", "112.69", "69.20"], ["2025-10", "205.73", "69.20"], ["2025-11", "318.18", "69.18"], ["2025-12", "309.97", "69.16"], ["2026-01", "316.44", "69.14"], ["2026-02", "309.97", "67.79"], ["2026-03", "309.97", "66.04"], ["2026-04", "309.97", "66.04"], ["2026-05", "309.97", "67.29"], ["2026-06", "309.97", "67.39"], ["2026-07", "309.97", "66.72"], ["2026-08", "309.97", "67.44"]]};
+const ORIGINAL = {"main": [["2025-01", "-68498.96", "200782.77", "9444.40", "207440.77", "6658.00", "-"], ["2025-02", "-4646.84", "167006.92", "9075.00", "173009.92", "6003.00", "63852.12"], ["2025-03", "-17959.11", "108157.87", "9075.00", "114150.87", "5993.00", "-13312.27"], ["2025-04", "-25154.32", "95228.50", "9000.00", "100488.50", "5260.00", "-7195.21"], ["2025-05", "-22027.73", "124255.45", "8925.00", "129505.45", "5250.00", "3126.59"], ["2025-06", "-50881.28", "95556.95", "9000.00", "101066.95", "5510.00", "-28853.55"], ["2025-07", "-48736.82", "115102.64", "10611.93", "120872.64", "5770.00", "2144.46"], ["2025-08", "-56514.92", "102640.73", "9179.67", "107895.73", "5255.00", "-7778.10"], ["2025-09", "-77192.17", "101295.00", "9297.20", "106810.00", "5515.00", "-20677.25"], ["2025-10", "7300.37", "206918.81", "9750.00", "212168.81", "5250.00", "84492.54"], ["2025-11", "-28566.58", "112918.05", "9672.20", "118428.05", "5510.00", "-35866.95"], ["2025-12", "-41195.41", "142967.64", "9825.00", "148482.64", "5515.00", "-12628.83"], ["2026-01", "-62549.59", "106043.62", "9372.20", "111463.62", "5420.00", "-21354.18"], ["2026-02", "-83119.88", "100891.47", "8925.00", "105816.47", "4925.00", "-20570.29"], ["2026-03", "-109118.32", "99678.90", "9375.00", "105127.30", "5448.40", "-25998.44"], ["2026-04", "-120926.53", "101962.13", "9000.00", "107392.13", "5430.00", "-11808.21"], ["2026-05", "-154046.58", "94164.70", "9075.00", "99603.10", "5438.40", "-33120.05"], ["2026-06", "-158309.90", "100993.00", "9525.00", "106668.00", "5675.00", "-4263.32"], ["2026-07", "-800.87", "96201.62", "9450.00", "101126.62", "4925.00", "157509.03"], ["2026-08", "-2261.55", "101161.94", "0", "106841.94", "5680.00", "-1460.68"]], "utilities": [["2025-04", "23905.98", "3159.65"], ["2025-05", "23905.98", "3030.39"], ["2025-06", "23905.98", "3244.48"], ["2025-07", "23905.98", "3222.87"], ["2025-08", "23905.98", "3068.20"], ["2025-09", "23905.98", "3465.47"], ["2025-10", "23905.98", "3293.90"], ["2025-11", "23905.98", "3891.06"], ["2025-12", "24710.72", "3270.87"], ["2026-01", "26239.72", "2950.14"], ["2026-02", "26239.57", "3509.19"], ["2026-03", "26239.72", "3696.50"], ["2026-04", "26239.72", "3680.51"], ["2026-05", "26239.72", "3990.88"], ["2026-06", "26239.72", "3748.74"], ["2026-07", "26239.72", "4115.97"], ["2026-08", "26006.61", "4326.38"]], "postal": [["2025-01", "0"], ["2025-02", "0"], ["2025-03", "0"], ["2025-04", "0"], ["2025-05", "0"], ["2025-06", "0"], ["2025-07", "0"], ["2025-08", "667.70"], ["2025-09", "603.10"], ["2025-10", "140.60"], ["2025-11", "492.35"], ["2025-12", "279.90"], ["2026-01", "386.30"], ["2026-02", "505.15"], ["2026-03", "245.75"], ["2026-04", "400.50"], ["2026-05", "154.00"], ["2026-06", "708.00"], ["2026-07", "750.60"], ["2026-08", "273.05"]], "homero": [["2025-08", "1000", "0"], ["2025-09", "1000", "1072.68"], ["2025-10", "3230", "1933.88"], ["2025-11", "1000", "2377.12"], ["2025-12", "5800", "5626.45"], ["2026-01", "1000", "1035.61"], ["2026-02", "1000", "1133.99"], ["2026-03", "2000", "966.44"], ["2026-04", "1000", "0"], ["2026-05", "1000", "1982.43"], ["2026-06", "1000", "0"], ["2026-07", "1000", "2262.89"], ["2026-08", "1000", "776.27"], ["2026-09", "1000", "820.40"]], "poupanca": [["2025-01", "0"], ["2025-02", "0"], ["2025-03", "0"], ["2025-04", "0"], ["2025-05", "0"], ["2025-06", "0"], ["2025-07", "0"], ["2025-08", "0"], ["2025-09", "303098.09"], ["2025-10", "319033.32"], ["2025-11", "321062.01"], ["2025-12", "428756.24"], ["2026-01", "430885.45"], ["2026-02", "433461.04"], ["2026-03", "436053.88"], ["2026-04", "438555.16"], ["2026-05", "441067.20"], ["2026-06", "443605.10"], ["2026-07", "375077.24"], ["2026-08", "376837.43"]], "internetGas": [["2025-04", "116.59", "69.56"], ["2025-05", "113.20", "69.92"], ["2025-06", "109.99", "70.18"], ["2025-07", "113.20", "70.18"], ["2025-08", "109.99", "69.71"], ["2025-09", "112.69", "69.20"], ["2025-10", "205.73", "69.20"], ["2025-11", "318.18", "69.18"], ["2025-12", "309.97", "69.16"], ["2026-01", "316.44", "69.14"], ["2026-02", "309.97", "67.79"], ["2026-03", "309.97", "66.04"], ["2026-04", "309.97", "66.04"], ["2026-05", "309.97", "67.29"], ["2026-06", "309.97", "67.39"], ["2026-07", "309.97", "66.72"], ["2026-08", "309.97", "67.44"]]};
 const KEY = "dashboard_saldo_devedor_v1";
 // Supabase: use somente a URL do projeto e a chave PUBLISHABLE (sb_publishable_...).
 // Nunca coloque a chave SECRET (sb_secret_...) neste arquivo.
@@ -617,7 +624,7 @@ const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "m
 })();
 
 function clone(x){ return JSON.parse(JSON.stringify(x)); }
-function loadData(){ try{ const s=localStorage.getItem(KEY); return s?JSON.parse(s):clone(ORIGINAL); }catch(e){ return clone(ORIGINAL); } }
+function loadData(){ try{ const s=localStorage.getItem(KEY); const d=s?JSON.parse(s):clone(ORIGINAL); if(!d.poupanca) d.poupanca=clone(ORIGINAL.poupanca); return d; }catch(e){ return clone(ORIGINAL); } }
 function persistLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(state.data)); }catch(e){} }
 async function loadCloudData(){
   if(!supabaseClient) return {ok:false, reason:"not_configured"};
@@ -626,6 +633,7 @@ async function loadCloudData(){
     if(error) throw error;
     if(data && data.data){
       state.data=clone(data.data);
+      if(!state.data.poupanca) state.data.poupanca=clone(ORIGINAL.poupanca);
       persistLocal();
       return {ok:true,updated_at:data.updated_at};
     }
@@ -1049,7 +1057,7 @@ function openChartModal(chartId,title){
   }else if(chartId==="utilitiesChart"){ rows=filtered(state.data.utilities); cols=[1,2]; labels=["Águas do Rio","Light"]; colors=["#0ea5e9","#f59e0b"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="internetGasChart"){ rows=filtered(state.data.internetGas); cols=[1,2]; labels=["INTERNET","GÁS NATURAL"]; colors=["#2563eb","#d97706"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="postalChart"){ rows=filtered(state.data.postal); cols=[1]; labels=["Despesas postais"]; colors=["#dc2626"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
-  }else if(chartId==="homeroChart"){ rows=filtered(state.data.homero); cols=[1,2]; labels=["Adiantamentos","Prestação de contas"]; colors=["#7c3aed","#16a34a"]; chartHtml=expandedBarChart(rows,cols,labels,colors); }
+  }else if(chartId==="homeroChart"){ rows=filtered(state.data.homero); cols=[1,2]; labels=["Adiantamentos","Prestação de contas"]; colors=["#7c3aed","#16a34a"]; chartHtml=expandedBarChart(rows,cols,labels,colors); }else if(chartId==="poupancaChart"){ rows=filtered(state.data.poupanca); cols=[1]; labels=["Poupança Casa Grande"]; colors=["#16a34a"]; chartHtml=expandedLineChart(rows,cols,labels,colors); }
   document.getElementById("chartModalTitle").textContent=title;
   document.getElementById("chartModalSub").textContent="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
   host.innerHTML=chartHtml;
@@ -1151,7 +1159,7 @@ function closeChartModal(e){
 }
 
 function bindChartClicks(){
-  const charts=[["saldoChart","Evolução do saldo devedor"],["receitaChart","Arrecadação × despesas"],["fundoChart","Fundo de reserva x Garagem"],["utilitiesChart","Águas do Rio × Light"],["internetGasChart","Internet × Gás Natural"],["postalChart","Despesas postais (correios)"],["homeroChart","Adiantamentos Homero"]];
+  const charts=[["saldoChart","Evolução do saldo devedor"],["receitaChart","Arrecadação × despesas"],["fundoChart","Fundo de reserva x Garagem"],["utilitiesChart","Águas do Rio × Light"],["internetGasChart","Internet × Gás Natural"],["postalChart","Despesas postais (correios)"],["homeroChart","Adiantamentos Homero"],["poupancaChart","Poupança Casa Grande"]];
   charts.forEach(([id,title])=>{
     const chart=document.getElementById(id); if(!chart) return;
     const wrapper=chart.closest(".chart-area"); if(!wrapper) return;
@@ -1282,6 +1290,12 @@ function render(){
   const homeroRows=filtered(state.data.homero);
   barChart("homeroChart",homeroRows,[1,2],["Adiantamentos","Prestação de contas"],["#7c3aed","#16a34a"]);
   renderHomeroSummary(homeroRows);
+  
+  const poupancaRows=filtered(state.data.poupanca);
+  lineChart("poupancaChart",poupancaRows,[1],["Poupança Casa Grande"],["#16a34a"]);
+  renderChartSummary("poupancaSummary",poupancaRows,[
+    {col:1,label:"Poupança Casa Grande",color:"#16a34a"}
+  ],"Resumo","poupanca-summary");
 
   bindChartClicks();
 }
@@ -1291,7 +1305,8 @@ const defs={
   utilities:{name:"Contas",headers:["Mês","Águas do Rio","Light"],types:["text","number","number"]},
   postal:{name:"Correios",headers:["Mês","Despesas postais"],types:["text","number"]},
   homero:{name:"Homero",headers:["Mês","Adiantamentos","Prestação de contas"],types:["text","number","number"]},
-  internetGas:{name:"Internet & Gás",headers:["Mês","INTERNET","GÁS NATURAL"],types:["text","number","number"]}
+  internetGas:{name:"Internet & Gás",headers:["Mês","INTERNET","GÁS NATURAL"],types:["text","number","number"]},
+  poupanca:{name:"Poupança Casa Grande",headers:["Mês","Poupança"],types:["text","number"]}
 };
 function renderEditor(){
   const tabs=document.getElementById("editorTabs");
