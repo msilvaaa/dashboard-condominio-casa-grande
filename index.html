@@ -1257,7 +1257,7 @@ function render(){
   renderKPIs(rows);renderInsights(rows);renderTable(rows);
 
   lineChart("saldoChart",rows,[1],["Saldo devedor"],["#2563eb"]);
-  renderChartSummary("saldoSummary",rows,[{col:1,label:"Saldo devedor",color:"#2563eb"}],"Resumo do saldo devedor","saldo-devedor-summary");
+  renderChartSummary("saldoSummary",rows,[{col:1,label:"Saldo devedor",color:"#2563eb"}],"","saldo-devedor-summary");
 
   lineChart("receitaChart",rows,[4,2],["Arrecadação","Condomínio"],["#16a34a","#64748b"]);
   renderChartSummary("receitaSummary",rows,[
