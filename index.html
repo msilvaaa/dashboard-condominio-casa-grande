@@ -317,20 +317,23 @@ html.dark svg [fill="#172033"]{fill:#e5e7eb !important}
 html.dark svg [fill="#ffffff"]{fill:#111827 !important}
 
 
-/* Mobile KPI: valores extensos permanecem dentro do card */
+/* Mobile KPI: valores extensos permanecem totalmente dentro do card */
 @media (max-width:700px){
   .kpi .value{
-    font-size:clamp(15px,5.1vw,20px);
-    letter-spacing:-.045em;
+    font-size:clamp(14px,4.6vw,19px);
+    letter-spacing:-.055em;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:clip;
-    padding:0 2px;
     min-width:0;
     width:100%;
+    max-width:100%;
+    padding:0 8px;
+    margin-left:auto;
+    margin-right:auto;
+    transform:none;
   }
 }
-
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
