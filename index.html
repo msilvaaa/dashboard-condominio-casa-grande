@@ -1277,7 +1277,7 @@ function render(){
   barChart("postalChart",postalRows,[1],["Despesas postais (correios)"],["#dc2626"]);
   renderChartSummary("postalSummary",postalRows,[
     {col:1,label:"Despesas postais",color:"#dc2626"}
-  ],"Resumo das despesas postais");
+  ],"Resumo das despesas postais","postal-summary");
 
   const homeroRows=filtered(state.data.homero);
   barChart("homeroChart",homeroRows,[1,2],["Adiantamentos","Prestação de contas"],["#7c3aed","#16a34a"]);
