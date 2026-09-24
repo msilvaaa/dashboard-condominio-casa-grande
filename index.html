@@ -83,11 +83,29 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .saldo-devedor-summary .chart-summary-stat:last-child{background:#eff6ff;border-radius:9px;margin-left:8px;border-left:0;padding-left:14px}
 .saldo-devedor-summary .chart-summary-stat:last-child span{color:#2563eb}
 .saldo-devedor-summary .chart-summary-stat:last-child b{font-size:14px;color:#1d4ed8;font-weight:900}
-/* Métricas centralizadas do resumo do saldo devedor */
-.saldo-devedor-summary .saldo-metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.saldo-devedor-summary .saldo-metric-card{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:64px;padding:10px 8px;border-color:#dbe4f0;background:linear-gradient(180deg,#ffffff 0%,#f7faff 100%);box-shadow:0 2px 8px rgba(16,24,40,.05)}
-.saldo-devedor-summary .saldo-metric-card span{font-size:8.5px;text-transform:uppercase;letter-spacing:.045em;color:#667085;font-weight:800;margin-bottom:5px}
-.saldo-devedor-summary .saldo-metric-card b{font-size:11px;color:#172033;font-weight:900;white-space:nowrap}
+/* Resumo do saldo devedor seguindo o Saldo Atual */
+.saldo-devedor-summary .saldo-atual-summary{
+  display:flex;flex-direction:column;align-items:flex-start;
+  padding:14px 16px;border:1px solid #dbe4f0;border-radius:12px;
+  background:#fff;box-shadow:0 2px 8px rgba(16,24,40,.05);
+}
+.saldo-devedor-summary .saldo-atual-summary-label{
+  font-size:10px;font-weight:800;color:#667085;margin-bottom:6px;
+}
+.saldo-devedor-summary .saldo-atual-summary-value{
+  font-size:22px;line-height:1.15;font-weight:900;color:#172033;
+  white-space:nowrap;
+}
+.saldo-devedor-summary .saldo-atual-summary-badge{
+  margin-top:8px;padding:5px 12px;border-radius:999px;
+  font-size:10px;font-weight:900;text-transform:lowercase;
+}
+.saldo-devedor-summary .saldo-atual-summary-badge.negativo{
+  color:#dc2626;background:#fff1f2;
+}
+.saldo-devedor-summary .saldo-atual-summary-badge.positivo{
+  color:#15803d;background:#f0fdf4;
+}
 @media(max-width:900px){
   .saldo-devedor-summary .saldo-metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
@@ -1142,16 +1160,15 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
   if(!rows || !rows.length){ box.innerHTML=""; return; }
 
   if(extraClass.includes("saldo-devedor-summary")){
-    const values=rows.map(r=>num(r[1]));
-    const avg=values.reduce((a,b)=>a+b,0)/values.length;
-    const max=Math.max(...values), min=Math.min(...values), last=values.at(-1);
+    const saldoAtual=num(rows.at(-1)[1]);
+    const classe=saldoAtual>=0?"positivo":"negativo";
+    const status=saldoAtual>=0?"positivo":"negativo";
     box.className=("chart-summary "+extraClass).trim();
     box.innerHTML='<div class="chart-summary-title">'+esc(title || "Resumo do gráfico")+'</div>'+
-      '<div class="chart-summary-grid saldo-metrics-grid">'+
-        '<div class="chart-summary-card saldo-metric-card"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
-        '<div class="chart-summary-card saldo-metric-card"><span>Maior valor</span><b>'+money(max)+'</b></div>'+
-        '<div class="chart-summary-card saldo-metric-card"><span>Menor valor</span><b>'+money(min)+'</b></div>'+
-        '<div class="chart-summary-card saldo-metric-card"><span>Último mês</span><b>'+money(last)+'</b></div>'+
+      '<div class="saldo-atual-summary">'+
+        '<div class="saldo-atual-summary-label">Saldo atual</div>'+
+        '<div class="saldo-atual-summary-value">'+money(saldoAtual)+'</div>'+
+        '<div class="saldo-atual-summary-badge '+classe+'">'+status+'</div>'+
       '</div>';
     return;
   }
