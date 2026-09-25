@@ -1065,7 +1065,23 @@ function openChartModal(chartId,title){
   }else if(chartId==="utilitiesChart"){ rows=filtered(state.data.utilities); cols=[1,2]; labels=["Águas do Rio","Light"]; colors=["#0ea5e9","#f59e0b"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="internetGasChart"){ rows=filtered(state.data.internetGas); cols=[1,2]; labels=["INTERNET","GÁS NATURAL"]; colors=["#2563eb","#d97706"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="postalChart"){ rows=filtered(state.data.postal); cols=[1]; labels=["Despesas postais"]; colors=["#dc2626"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
-  }else if(chartId==="homeroChart"){ rows=filtered(state.data.homero); cols=[1,2]; labels=["Adiantamentos","Prestação de contas"]; colors=["#7c3aed","#16a34a"]; chartHtml=expandedBarChart(rows,cols,labels,colors); }else if(chartId==="rendimentosChart"){ const pou=filtered(state.data.poupanca), allP=state.data.poupanca || [], map=Object.fromEntries(pou.map(r=>[r[0],num(r[1])])), rendMap=Object.fromEntries(allP.map((r,i)=>[r[0],num(r[1])-(i>0?num(allP[i-1][1]):num(r[1]))])); rows=pou.map(r=>[r[0],rendMap[r[0]] ?? 0,map[r[0]] ?? 0]); cols=[1,2]; labels=["Rendimentos","Poupança"]; colors=["#2563eb","#16a34a"]; chartHtml=expandedLineChart(rows,cols,labels,colors,2); }
+  }else if(chartId==="homeroChart"){ rows=filtered(state.data.homero); cols=[1,2]; labels=["Adiantamentos","Prestação de contas"]; colors=["#7c3aed","#16a34a"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
+  }else if(chartId==="rendimentosChart"){
+    const pou=filtered(state.data.poupanca), allP=state.data.poupanca || [];
+    const map=Object.fromEntries(pou.map(r=>[r[0],num(r[1])]));
+    const rendMap=Object.fromEntries(allP.map((r,i)=>{
+      const anterior=i>0?num(allP[i-1][1]):num(r[1]);
+      return [r[0],r[0]==="2025-09"?0:num(r[1])-anterior];
+    }));
+    rows=pou.map(r=>[r[0],rendMap[r[0]] ?? 0,map[r[0]] ?? 0]);
+    cols=[1,2]; labels=["Rendimentos","Poupança"]; colors=["#2563eb","#16a34a"];
+    chartHtml=expandedLineChart(rows,cols,labels,colors,2);
+  }else if(chartId==="inadimplenciaChart"){
+    const base=filtered(state.data.poupanca || []);
+    rows=base.map(r=>[r[0],0]);
+    cols=[1]; labels=["Inadimplência"]; colors=["#dc2626"];
+    chartHtml=expandedLineChart(rows,cols,labels,colors,2);
+  }
   document.getElementById("chartModalTitle").textContent=title;
   document.getElementById("chartModalSub").textContent="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
   host.innerHTML=chartHtml;
