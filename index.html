@@ -970,13 +970,23 @@ function renderInsights(rows){
   const best=evo.reduce((a,v,i)=>v>a.v?{v,i}:a,{v:-Infinity,i:0}), worst=evo.reduce((a,v,i)=>v<a.v?{v,i}:a,{v:Infinity,i:0});
   const deficit=rows.filter(r=>num(r[4])<num(r[2])).length;
   const avgDiff=ar.reduce((s,v,i)=>s+(v-(cond[i]||0)),0)/ar.length;
+  const totalAr=ar.reduce((s,v)=>s+v,0);
+  const totalCond=cond.reduce((s,v)=>s+v,0);
+  const fund=rows.map(r=>num(r[3]));
+  const gar=rows.map(r=>num(r[5]));
+  const avgFund=fund.reduce((s,v)=>s+v,0)/fund.length;
+  const avgGar=gar.reduce((s,v)=>s+v,0)/gar.length;
   const cards=[
-    ["Maior saldo positivo",`Pico de ${money(max)} em ${fmtMonth(maxM)}.`],
-    ["Maior saldo negativo",`Mínimo de ${money(min)} em ${fmtMonth(minM)}.`],
-    ["Maior evolução mensal",`${money(best.v)} em ${fmtMonth(rows[best.i][0])}.`],
-    ["Maior queda mensal",`${money(worst.v)} em ${fmtMonth(rows[worst.i][0])}.`],
-    ["Meses com arrecadação abaixo do condomínio",`${deficit} de ${rows.length} meses.`],
-    ["Arrecadação x condomínio",`Diferença média mensal: ${money(avgDiff)}.`]
+    ["Maior saldo positivo","Pico de "+money(max)+" em "+fmtMonth(maxM)+"."],
+    ["Maior saldo negativo","Mínimo de "+money(min)+" em "+fmtMonth(minM)+"."],
+    ["Maior evolução mensal",money(best.v)+" em "+fmtMonth(rows[best.i][0])+"."],
+    ["Maior queda mensal",money(worst.v)+" em "+fmtMonth(rows[worst.i][0])+"."],
+    ["Meses com arrecadação abaixo do condomínio",deficit+" de "+rows.length+" meses."],
+    ["Arrecadação x condomínio","Diferença média mensal: "+money(avgDiff)+"."],
+    ["Arrecadação total no período",money(totalAr)+"."],
+    ["Condomínio total no período",money(totalCond)+"."],
+    ["Fundo de reserva médio",money(avgFund)+" por mês."],
+    ["Garagem média",money(avgGar)+" por mês."]
   ];
   document.getElementById("insights").innerHTML=cards.map(x=>`<div class="insight"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
 }
