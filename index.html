@@ -1303,8 +1303,8 @@ function render(){
   const rendimentosChartRows=poupancaRows.map(r=>[r[0],rendimentoByMonth[r[0]] ?? 0,poupancaByMonth[r[0]] ?? 0]);
   lineChart("rendimentosChart",rendimentosChartRows,[1,2],["Rendimentos","Poupança"],["#2563eb","#16a34a"],2);
   renderChartSummary("rendimentosSummary",rendimentosChartRows,[
-    {col:1,label:"Rendimentos",color:"#2563eb"},
-    {col:2,label:"Poupança",color:"#16a34a"}
+    {col:2,label:"Poupança",color:"#16a34a"},
+    {col:1,label:"Rendimentos",color:"#2563eb"}
   ],"Resumo","compact-two");
 
   bindChartClicks();
