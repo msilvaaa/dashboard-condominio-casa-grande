@@ -25,7 +25,7 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.insight{padding:12px;border-radius:14px;background:var(--panel2);border:1px solid var(--line)}.insight b{display:block;font-size:13px;margin-bottom:3px}.insight span{font-size:12px;color:var(--muted);line-height:1.45}
 .table-card{overflow:hidden}.table-scroll{overflow:auto;max-height:440px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}th:first-child,td:first-child{text-align:left}thead th{position:sticky;top:0;background:#f8fafc;color:#475467;font-size:11px;text-transform:uppercase;letter-spacing:.04em;z-index:2}tbody tr:hover{background:#fbfdff}
 .pos{color:var(--green);font-weight:800}.neg{color:var(--red);font-weight:800}
-.footer-note{font-size:11px;color:var(--muted);margin-top:12px}.chart-area{position:relative}.chart-period-label{font-size:11px;font-weight:800;fill:#1d4ed8}.chart-period-label-bg{fill:#eef5ff}.chart-period-inline{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:4px 12px;border-radius:999px;background:#eef5ff;color:#1d4ed8;font-size:11px;font-weight:800;line-height:1;white-space:nowrap;margin-left:8px}
+.footer-note{font-size:11px;color:var(--muted);margin-top:12px}.chart-area{position:relative}.chart-period-label{font-size:11px;font-weight:800;fill:#1d4ed8}.chart-period-label-bg{fill:#eef5ff}.chart-period-inline{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:4px 12px;border-radius:999px;background:#eef5ff;color:#1d4ed8;font-size:11px;font-weight:800;line-height:1;white-space:nowrap;margin-left:auto}
 .chart-summary{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .chart-summary-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#667085;margin-bottom:9px}
 .chart-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.chart-summary.compact-two .chart-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-summary.compact-two .chart-summary-card{min-width:0;padding:10px 12px}.chart-summary.single-series .chart-summary-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -1345,9 +1345,10 @@ function renderInadimplencia(rows){
   }
 }
 function renderChartPeriodLabels(){
-  [["saldoChart",state.data.main],["receitaChart",state.data.main],["fundoChart",state.data.main],["utilitiesChart",state.data.utilities],["internetGasChart",state.data.internetGas],["postalChart",state.data.postal],["homeroChart",state.data.homero],["rendimentosChart",state.data.poupanca],["inadimplenciaChart",state.data.main]].forEach(([id,source])=>{
-    const rows=filtered(source||[]); setChartPeriodLabel(id,rows.length?rows[0][0]:state.start,rows.length?rows.at(-1)[0]:state.end);
-  });
+  // Todos os gráficos exibem exatamente o intervalo escolhido nos filtros,
+  // independentemente de a fonte daquele gráfico ter dados em todos os meses.
+  ["saldoChart","receitaChart","fundoChart","utilitiesChart","internetGasChart","postalChart","homeroChart","rendimentosChart","inadimplenciaChart"]
+    .forEach(id=>setChartPeriodLabel(id,state.start,state.end));
 }
 function render(){
   const rows=filtered(state.data.main);
