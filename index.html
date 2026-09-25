@@ -1378,7 +1378,7 @@ function renderEditor(){
     toast("Linha adicionada.");
   });
   document.querySelectorAll(".small-delete").forEach(btn=>btn.addEventListener("click",()=>{state.data[state.editorTab].splice(Number(btn.dataset.del),1);renderEditor()}));
-  document.querySelectorAll(".edit-table input").forEach(inp=>inp.addEventListener("change",()=>{\n    state.data[state.editorTab][Number(inp.dataset.r)][Number(inp.dataset.c)]=inp.value;\n    if(state.editorTab==="poupanca"){\n      // A Poupança é a fonte dos Rendimentos: ao alterar um valor,\n      // recalcula imediatamente o gráfico e o resumo, sem exigir recarregar a página.\n      render();\n    }\n  }));
+  document.querySelectorAll(".edit-table input").forEach(inp=>inp.addEventListener("change",()=>{state.data[state.editorTab][Number(inp.dataset.r)][Number(inp.dataset.c)]=inp.value}));
 }
 
 document.getElementById("printExpandedChart")?.addEventListener("click",printExpandedChart);
