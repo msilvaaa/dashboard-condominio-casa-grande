@@ -786,7 +786,7 @@ function bindBarTooltips(svg, tip, rows, cols, labels){
   });
 }
 
-function lineChart(id, rows, cols, labels, colors){
+function lineChart(id, rows, cols, labels, colors, strokeWidth=3.5){
   const el=document.getElementById(id), W=920,H=350,pl=74,pr=24,pt=36,pb=48;
   if(!rows.length){el.innerHTML='<text x="50%" y="50%" text-anchor="middle" fill="#667085">Sem dados no período</text>';return}
   const series=cols.map(c=>rows.map(r=>num(r[c])));
@@ -808,7 +808,7 @@ function lineChart(id, rows, cols, labels, colors){
 
   series.forEach((arr,si)=>{
     const d=arr.map((v,i)=>(i?"L":"M")+x(i)+" "+y(v)).join(" ");
-    s+=`<path d="${d}" fill="none" stroke="${colors[si]}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    s+=`<path d="${d}" fill="none" stroke="${colors[si]}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>`;
 
     // Small hover targets at every point. Values are shown in the browser tooltip.
     arr.forEach((v,i)=>{
@@ -983,7 +983,7 @@ function buildExpandedTable(rows, cols, labels, colors){
   return out;
 }
 
-function expandedLineChart(rows, cols, labels, colors){
+function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   const W=1460,H=620,pl=108,pr=42,pt=58,pb=92;
   if(!rows.length) return '<div style="padding:50px;text-align:center;color:#667085">Sem dados no período</div>';
   const series=cols.map(c=>rows.map(r=>num(r[c])));
@@ -1058,7 +1058,7 @@ function openChartModal(chartId,title){
   }else if(chartId==="utilitiesChart"){ rows=filtered(state.data.utilities); cols=[1,2]; labels=["Águas do Rio","Light"]; colors=["#0ea5e9","#f59e0b"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="internetGasChart"){ rows=filtered(state.data.internetGas); cols=[1,2]; labels=["INTERNET","GÁS NATURAL"]; colors=["#2563eb","#d97706"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="postalChart"){ rows=filtered(state.data.postal); cols=[1]; labels=["Despesas postais"]; colors=["#dc2626"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
-  }else if(chartId==="homeroChart"){ rows=filtered(state.data.homero); cols=[1,2]; labels=["Adiantamentos","Prestação de contas"]; colors=["#7c3aed","#16a34a"]; chartHtml=expandedBarChart(rows,cols,labels,colors); }else if(chartId==="rendimentosChart"){ rows=filtered(state.data.rendimentos); cols=[1]; labels=["Rendimentos"]; colors=["#2563eb"]; chartHtml=expandedLineChart(rows,cols,labels,colors); }
+  }else if(chartId==="homeroChart"){ rows=filtered(state.data.homero); cols=[1,2]; labels=["Adiantamentos","Prestação de contas"]; colors=["#7c3aed","#16a34a"]; chartHtml=expandedBarChart(rows,cols,labels,colors); }else if(chartId==="rendimentosChart"){ const rend=filtered(state.data.rendimentos), pou=filtered(state.data.poupanca), map=Object.fromEntries(pou.map(r=>[r[0],num(r[1])])); rows=rend.map(r=>[r[0],num(r[1]),map[r[0]] ?? 0]); cols=[1,2]; labels=["Rendimentos","Montante da poupança"]; colors=["#2563eb","#16a34a"]; chartHtml=expandedLineChart(rows,cols,labels,colors,2); }
   document.getElementById("chartModalTitle").textContent=title;
   document.getElementById("chartModalSub").textContent="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
   host.innerHTML=chartHtml;
@@ -1293,9 +1293,13 @@ function render(){
   renderHomeroSummary(homeroRows);
   
   const rendimentosRows=filtered(state.data.rendimentos);
-  lineChart("rendimentosChart",rendimentosRows,[1],["Rendimentos"],["#2563eb"]);
-  renderChartSummary("rendimentosSummary",rendimentosRows,[
-    {col:1,label:"Rendimentos",color:"#2563eb"}
+  const poupancaRows=filtered(state.data.poupanca);
+  const poupancaByMonth=Object.fromEntries(poupancaRows.map(r=>[r[0],num(r[1])]));
+  const rendimentosChartRows=rendimentosRows.map(r=>[r[0],num(r[1]),poupancaByMonth[r[0]] ?? 0]);
+  lineChart("rendimentosChart",rendimentosChartRows,[1,2],["Rendimentos","Montante da poupança"],["#2563eb","#16a34a"],2);
+  renderChartSummary("rendimentosSummary",rendimentosChartRows,[
+    {col:1,label:"Rendimentos",color:"#2563eb"},
+    {col:2,label:"Montante da poupança",color:"#16a34a"}
   ],"Resumo");
 
   bindChartClicks();
