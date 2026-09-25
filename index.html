@@ -501,13 +501,13 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
   <div class="grid layout-2" style="margin-top:16px">
     <section class="card">
       <div class="title-row"><div><div class="title">Poupança Casa Grande</div><div class="tiny">Evolução mensal dos rendimentos da poupança no período selecionado</div></div></div>
-      <div class="chart-wrap chart-area"><div id="rendimentosTip" class="chart-tooltip"></div><svg id="rendimentosChart" viewBox="0 0 920 320" aria-label="Gráfico da Poupança Casa Grande"></svg></div>
+      <div class="chart-wrap chart-area"><div id="rendimentosTip" class="chart-tooltip"></div><svg id="rendimentosChart" viewBox="0 0 920 350" aria-label="Gráfico da Poupança Casa Grande"></svg></div>
       <div id="rendimentosSummary" class="chart-summary"></div>
       <div class="legend"><span><i class="dot" style="background:#2563eb"></i>Rendimentos</span><span><i class="dot" style="background:#16a34a"></i>Poupança</span></div>
     </section>
     <section class="card">
       <div class="title-row"><div><div class="title">Inadimplência</div><div class="tiny">Evolução mensal da inadimplência no período selecionado</div></div></div>
-      <div class="chart-wrap chart-area"><div id="inadimplenciaTip" class="chart-tooltip"></div><svg id="inadimplenciaChart" viewBox="0 0 920 320" aria-label="Gráfico da Inadimplência"></svg></div>
+      <div class="chart-wrap chart-area"><div id="inadimplenciaTip" class="chart-tooltip"></div><svg id="inadimplenciaChart" viewBox="0 0 920 350" aria-label="Gráfico da Inadimplência"></svg></div>
       <div id="inadimplenciaSummary" class="chart-summary"></div>
       <div class="legend"><span><i class="dot" style="background:#dc2626"></i>Inadimplência</span></div>
     </section>
@@ -1324,14 +1324,14 @@ function render(){
     return [r[0],rendimento];
   }));
   const rendimentosChartRows=poupancaRows.map(r=>[r[0],rendimentoByMonth[r[0]] ?? 0,poupancaByMonth[r[0]] ?? 0]);
-  lineChart("rendimentosChart",rendimentosChartRows,[1,2],["Rendimentos","Poupança"],["#2563eb","#16a34a"],2);
+  lineChart("rendimentosChart",rendimentosChartRows,[1,2],["Rendimentos","Poupança"],["#2563eb","#16a34a"]);
   renderChartSummary("rendimentosSummary",rendimentosChartRows,[
     {col:2,label:"Poupança",color:"#16a34a"},
     {col:1,label:"Rendimentos",color:"#2563eb"}
   ],"Resumo","compact-two");
 
   const inadimplenciaRows=poupancaRows.map(r=>[r[0],0]);
-  lineChart("inadimplenciaChart",inadimplenciaRows,[1],["Inadimplência"],["#dc2626"],2);
+  lineChart("inadimplenciaChart",inadimplenciaRows,[1],["Inadimplência"],["#dc2626"]);
   renderChartSummary("inadimplenciaSummary",inadimplenciaRows,[
     {col:1,label:"Inadimplência",color:"#dc2626"}
   ],"Resumo","single-series");
