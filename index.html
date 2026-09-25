@@ -126,6 +126,27 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
   .saldo-devedor-summary .chart-summary-stat:last-child{margin:8px 0 0;padding-left:10px;border-radius:8px}
 }
 @media(max-width:700px){
+  .saldo-devedor-summary .saldo-summary-card .saldo-atual-summary{
+    align-items:center;
+    width:100%;
+    max-width:100%;
+    padding:12px 8px 14px;
+    overflow:hidden;
+    text-align:center;
+  }
+  .saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-label,
+  .saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-value,
+  .saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-badge{
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+  }
+  .saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-value{
+    max-width:100%;
+    font-size:20px;
+  }
+}
+@media(max-width:700px){
   .saldo-devedor-summary .chart-summary-card{grid-template-columns:1fr 1fr}
   .saldo-devedor-summary .chart-summary-stat b{font-size:10px}
   .saldo-devedor-summary .chart-summary-stat:last-child b{font-size:13px}
