@@ -501,9 +501,15 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
   <div class="grid layout-2" style="margin-top:16px">
     <section class="card">
       <div class="title-row"><div><div class="title">Poupança Casa Grande</div><div class="tiny">Evolução mensal dos rendimentos da poupança no período selecionado</div></div></div>
-      <div class="chart-wrap chart-area"><div id="rendimentosTip" class="chart-tooltip"></div><svg id="rendimentosChart" viewBox="0 0 920 320" aria-label="Gráfico dos Rendimentos"></svg></div>
+      <div class="chart-wrap chart-area"><div id="rendimentosTip" class="chart-tooltip"></div><svg id="rendimentosChart" viewBox="0 0 920 320" aria-label="Gráfico da Poupança Casa Grande"></svg></div>
       <div id="rendimentosSummary" class="chart-summary"></div>
       <div class="legend"><span><i class="dot" style="background:#2563eb"></i>Rendimentos</span><span><i class="dot" style="background:#16a34a"></i>Poupança</span></div>
+    </section>
+    <section class="card">
+      <div class="title-row"><div><div class="title">Inadimplência</div><div class="tiny">Evolução mensal da inadimplência no período selecionado</div></div></div>
+      <div class="chart-wrap chart-area"><div id="inadimplenciaTip" class="chart-tooltip"></div><svg id="inadimplenciaChart" viewBox="0 0 920 320" aria-label="Gráfico da Inadimplência"></svg></div>
+      <div id="inadimplenciaSummary" class="chart-summary"></div>
+      <div class="legend"><span><i class="dot" style="background:#dc2626"></i>Inadimplência</span></div>
     </section>
   </div>
 
@@ -1161,7 +1167,7 @@ function closeChartModal(e){
 }
 
 function bindChartClicks(){
-  const charts=[["saldoChart","Evolução do saldo devedor"],["receitaChart","Arrecadação × despesas"],["fundoChart","Fundo de reserva x Garagem"],["utilitiesChart","Águas do Rio × Light"],["internetGasChart","Internet × Gás Natural"],["postalChart","Despesas postais (correios)"],["homeroChart","Adiantamentos Homero"],["rendimentosChart","Rendimentos"]];
+  const charts=[["saldoChart","Evolução do saldo devedor"],["receitaChart","Arrecadação × despesas"],["fundoChart","Fundo de reserva x Garagem"],["utilitiesChart","Águas do Rio × Light"],["internetGasChart","Internet × Gás Natural"],["postalChart","Despesas postais (correios)"],["homeroChart","Adiantamentos Homero"],["rendimentosChart","Poupança Casa Grande"],["inadimplenciaChart","Inadimplência"]];
   charts.forEach(([id,title])=>{
     const chart=document.getElementById(id); if(!chart) return;
     const wrapper=chart.closest(".chart-area"); if(!wrapper) return;
@@ -1294,7 +1300,7 @@ function render(){
   renderHomeroSummary(homeroRows);
   
   const poupancaRows=filtered(state.data.poupanca);
-  const poupancaByMonth=Object.fromEntries(poupancaRows.map(r=>[r[0],num(r[1])]));
+  const poupancaByMonth=Object.fromEntries(poupancaRows.map(r=>[r[0],r[0]==="2025-09"?0:num(r[1])]));
   const allPoupancaRows=state.data.poupanca || [];
   const rendimentoByMonth=Object.fromEntries(allPoupancaRows.map((r,i)=>{
     const anterior=i>0?num(allPoupancaRows[i-1][1]):num(r[1]);
@@ -1306,6 +1312,12 @@ function render(){
     {col:2,label:"Poupança",color:"#16a34a"},
     {col:1,label:"Rendimentos",color:"#2563eb"}
   ],"Resumo","compact-two");
+
+  const inadimplenciaRows=poupancaRows.map(r=>[r[0],0]);
+  lineChart("inadimplenciaChart",inadimplenciaRows,[1],["Inadimplência"],["#dc2626"],2);
+  renderChartSummary("inadimplenciaSummary",inadimplenciaRows,[
+    {col:1,label:"Inadimplência",color:"#dc2626"}
+  ],"Resumo","single-series");
 
   bindChartClicks();
 }
