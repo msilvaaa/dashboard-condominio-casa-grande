@@ -25,7 +25,7 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.insight{padding:12px;border-radius:14px;background:var(--panel2);border:1px solid var(--line)}.insight b{display:block;font-size:13px;margin-bottom:3px}.insight span{font-size:12px;color:var(--muted);line-height:1.45}
 .table-card{overflow:hidden}.table-scroll{overflow:auto;max-height:440px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}th:first-child,td:first-child{text-align:left}thead th{position:sticky;top:0;background:#f8fafc;color:#475467;font-size:11px;text-transform:uppercase;letter-spacing:.04em;z-index:2}tbody tr:hover{background:#fbfdff}
 .pos{color:var(--green);font-weight:800}.neg{color:var(--red);font-weight:800}
-.footer-note{font-size:11px;color:var(--muted);margin-top:12px}.chart-area{position:relative}
+.footer-note{font-size:11px;color:var(--muted);margin-top:12px}.chart-area{position:relative}.chart-period-label{font-size:11px;font-weight:800;fill:var(--muted)}
 .chart-summary{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .chart-summary-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#667085;margin-bottom:9px}
 .chart-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.chart-summary.compact-two .chart-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-summary.compact-two .chart-summary-card{min-width:0;padding:10px 12px}.chart-summary.single-series .chart-summary-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -1289,6 +1289,53 @@ function renderHomeroSummary(rows){
     </div>`;
 }
 
+function monthRangeLabel(start,end){
+  const names=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  const fmt=v=>{const [y,m]=String(v).split("-");return names[Number(m)-1]+"/"+y;};
+  return start&&end?fmt(start)+" a "+fmt(end):"";
+}
+function setChartPeriodLabel(chartId,start,end){
+  const svg=document.getElementById(chartId); if(!svg) return;
+  const parts=(svg.getAttribute("viewBox")||"0 0 920 350").split(/\s+/).map(Number), W=parts[2]||920;
+  let node=svg.querySelector(".chart-period-label");
+  if(!node){
+    node=document.createElementNS("http://www.w3.org/2000/svg","text");
+    node.setAttribute("class","chart-period-label"); node.setAttribute("text-anchor","end");
+    node.setAttribute("font-size","11"); node.setAttribute("font-weight","800"); node.setAttribute("fill","#667085");
+    node.setAttribute("pointer-events","none"); svg.appendChild(node);
+  }
+  node.setAttribute("x",String(W-20)); node.setAttribute("y","18"); node.textContent=monthRangeLabel(start,end);
+}
+function renderInadimplencia(rows){
+  const mainRows=filtered(state.data.main), byMonth=new Map(mainRows.map(r=>[String(r[0]),num(r[2])]));
+  const calcRows=(rows||[]).map(r=>{
+    const month=String(r[0]), [y,m]=month.split("-").map(Number);
+    const previsto=(y<2026 || (y===2026 && m<=6))?99000:98250;
+    return [month,Math.max(0,previsto-(byMonth.get(month)??0))];
+  });
+  lineChart("inadimplenciaChart",calcRows,[1],["Inadimplência Casa Grande"],["#dc2626"]);
+  const box=document.getElementById("inadimplenciaSummary");
+  if(box&&calcRows.length){
+    const previstoTotal=calcRows.reduce((s,r)=>{const [y,m]=r[0].split("-").map(Number);return s+((y<2026||(y===2026&&m<=6))?99000:98250);},0);
+    const inadTotal=calcRows.reduce((s,r)=>s+num(r[1]),0), arrecTotal=previstoTotal-inadTotal, pct=previstoTotal?inadTotal/previstoTotal*100:0;
+    const vals=calcRows.map(r=>num(r[1])), avg=inadTotal/vals.length, min=Math.min(...vals), max=Math.max(...vals);
+    box.className="chart-summary postal-summary";
+    box.innerHTML='<div class="chart-summary-title">Resumo</div><div class="chart-summary-grid"><div class="chart-summary-card">'+
+      '<div class="chart-summary-series"><span class="chart-summary-dot" style="background:#dc2626"></span><span>Inadimplência</span></div>'+
+      '<div class="chart-summary-stat"><span>Previsto</span><b>'+money(previstoTotal)+'</b></div>'+
+      '<div class="chart-summary-stat"><span>Arrecadado</span><b>'+money(arrecTotal)+'</b></div>'+
+      '<div class="chart-summary-stat"><span>Inadimplência</span><b>'+money(inadTotal)+' ('+pct.toLocaleString("pt-BR",{maximumFractionDigits:2})+'%)</b></div>'+
+      '<div class="chart-summary-stat"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
+      '<div class="chart-summary-stat"><span>Menor</span><b>'+money(min)+' · '+fmtMonth(calcRows[vals.indexOf(min)][0])+'</b></div>'+
+      '<div class="chart-summary-stat"><span>Maior</span><b>'+money(max)+' · '+fmtMonth(calcRows[vals.indexOf(max)][0])+'</b></div>'+
+    '</div></div>';
+  }
+}
+function renderChartPeriodLabels(){
+  [["saldoChart",state.data.main],["receitaChart",state.data.main],["fundoChart",state.data.main],["utilitiesChart",state.data.utilities],["internetGasChart",state.data.internetGas],["postalChart",state.data.postal],["homeroChart",state.data.homero],["rendimentosChart",state.data.poupanca],["inadimplenciaChart",state.data.main]].forEach(([id,source])=>{
+    const rows=filtered(source||[]); setChartPeriodLabel(id,rows.length?rows[0][0]:state.start,rows.length?rows.at(-1)[0]:state.end);
+  });
+}
 function render(){
   const rows=filtered(state.data.main);
   renderKPIs(rows);renderInsights(rows);renderTable(rows);
@@ -1347,13 +1394,10 @@ function render(){
     {col:1,label:"Rendimentos",color:"#2563eb"}
   ],"Resumo","compact-two poupanca-summary");
 
-  const inadimplenciaRows=poupancaRows.map(r=>[r[0],0]);
-  lineChart("inadimplenciaChart",inadimplenciaRows,[1],["Inadimplência Casa Grande"],["#dc2626"]);
-  renderChartSummary("inadimplenciaSummary",inadimplenciaRows,[
-    {col:1,label:"Inadimplência Casa Grande",color:"#dc2626"}
-  ],"Resumo","postal-summary");
-
+  renderInadimplencia(poupancaRows);
+  renderChartPeriodLabels();
   bindChartClicks();
+
 }
 function toast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2200)}
 const defs={
