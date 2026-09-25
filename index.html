@@ -1175,6 +1175,23 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
   if(!box)return;
   if(!rows || !rows.length){ box.innerHTML=""; return; }
 
+  if(extraClass.includes("poupanca-summary")){
+    const values=rows.map(r=>num(r[1]));
+    const rendimentos=rows.map(r=>num(r[2]));
+    const media=rendimentos.length?rendimentos.reduce((a,b)=>a+b,0)/rendimentos.length:0;
+    const maior=Math.max(...rendimentos);
+    const menor=Math.min(...rendimentos);
+    const ultimo=rendimentos.at(-1)||0;
+    const acumulado=values.length?values.at(-1)-values[0]:0;
+    box.className=("chart-summary "+extraClass).trim();
+    box.innerHTML='<div class="chart-summary-title">'+esc(title || "Resumo da poupança")+'</div>'+
+      '<div class="chart-summary-grid">'+
+        '<div class="chart-summary-card"><div class="chart-summary-series"><span class="chart-summary-dot" style="background:#16a34a"></span><span>Poupança Casa Grande</span></div><div class="chart-summary-stat"><span>Saldo atual</span><b>'+money(values.at(-1)||0)+'</b></div></div>'+
+        '<div class="chart-summary-card"><div class="chart-summary-series"><span class="chart-summary-dot" style="background:#2563eb"></span><span>Rendimento / variação</span></div><div class="chart-summary-stat"><span>Acumulado no período</span><b>'+money(acumulado)+'</b></div><div class="chart-summary-stat"><span>Média mensal</span><b>'+money(media)+'</b></div><div class="chart-summary-stat"><span>Maior mês</span><b>'+money(maior)+'</b></div><div class="chart-summary-stat"><span>Menor mês</span><b>'+money(menor)+'</b></div><div class="chart-summary-stat"><span>Último mês</span><b>'+money(ultimo)+'</b></div></div>'+
+      '</div>';
+    return;
+  }
+
   if(extraClass.includes("saldo-devedor-summary")){
     const saldoAtual=num(rows.at(-1)[1]);
     const classe=saldoAtual>=0?"positivo":"negativo";
@@ -1291,10 +1308,15 @@ function render(){
   barChart("homeroChart",homeroRows,[1,2],["Adiantamentos","Prestação de contas"],["#7c3aed","#16a34a"]);
   renderHomeroSummary(homeroRows);
   
-  const poupancaRows=filtered(state.data.poupanca);
-  lineChart("poupancaChart",poupancaRows,[1],["Poupança Casa Grande"],["#16a34a"]);
+  const poupancaBaseRows=filtered(state.data.poupanca);
+  const poupancaRows=poupancaBaseRows.map((r,i)=>{
+    const anterior=i>0?num(poupancaBaseRows[i-1][1]):num(r[1]);
+    return [r[0],r[1],num(r[1])-anterior];
+  });
+  lineChart("poupancaChart",poupancaRows,[1,2],["Poupança Casa Grande","Rendimento / variação mensal"],["#16a34a","#2563eb"]);
   renderChartSummary("poupancaSummary",poupancaRows,[
-    {col:1,label:"Poupança Casa Grande",color:"#16a34a"}
+    {col:1,label:"Poupança Casa Grande",color:"#16a34a"},
+    {col:2,label:"Rendimento / variação mensal",color:"#2563eb"}
   ],"Resumo","poupanca-summary");
 
   bindChartClicks();
