@@ -1098,10 +1098,17 @@ function openChartModal(chartId,title){
     cols=[1,2]; labels=["Rendimentos","Poupança"]; colors=["#2563eb","#16a34a"];
     chartHtml=expandedLineChart(rows,cols,labels,colors,2);
   }else if(chartId==="inadimplenciaChart"){
-    const base=filtered(state.data.poupanca || []);
-    rows=base.map(r=>[r[0],0]);
-    cols=[1]; labels=["Inadimplência Casa Grande"]; colors=["#dc2626"];
-    chartHtml=expandedLineChart(rows,cols,labels,colors,2);
+    const base=filtered(state.data.main || []);
+    rows=base.map(r=>{
+      const [y,m]=String(r[0]).split("-").map(Number);
+      const previsto=(y<2026 || (y===2026 && m<=6))?99000:98250;
+      const executada=num(r[4]);
+      return [r[0],previsto,executada,previsto-executada];
+    });
+    cols=[1,2,3];
+    labels=["Arrecadação prevista","Arrecadação executada","Inadimplência Casa Grande"];
+    colors=["#2563eb","#16a34a","#dc2626"];
+    chartHtml=expandedLineChart(rows,cols,labels,colors);
   }
   document.getElementById("chartModalTitle").textContent=title;
   document.getElementById("chartModalSub").textContent="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
@@ -1338,29 +1345,32 @@ function setChartPeriodLabel(chartId,start,end){
 }
 
 function renderInadimplencia(rows){
-  const mainRows=filtered(state.data.main), byMonth=new Map(mainRows.map(r=>[String(r[0]),num(r[2])]));
   const calcRows=(rows||[]).map(r=>{
     const month=String(r[0]), [y,m]=month.split("-").map(Number);
     const previsto=(y<2026 || (y===2026 && m<=6))?99000:98250;
-    return [month,Math.max(0,previsto-(byMonth.get(month)??0))];
+    const executada=num(r[4]);
+    const inadimplencia=previsto-executada;
+    return [month,previsto,executada,inadimplencia];
   });
-  lineChart("inadimplenciaChart",calcRows,[1],["Inadimplência Casa Grande"],["#dc2626"]);
-  const box=document.getElementById("inadimplenciaSummary");
-  if(box&&calcRows.length){
-    const previstoTotal=calcRows.reduce((s,r)=>{const [y,m]=r[0].split("-").map(Number);return s+((y<2026||(y===2026&&m<=6))?99000:98250);},0);
-    const inadTotal=calcRows.reduce((s,r)=>s+num(r[1]),0), arrecTotal=previstoTotal-inadTotal, pct=previstoTotal?inadTotal/previstoTotal*100:0;
-    const vals=calcRows.map(r=>num(r[1])), avg=inadTotal/vals.length, min=Math.min(...vals), max=Math.max(...vals);
-    box.className="chart-summary postal-summary";
-    box.innerHTML='<div class="chart-summary-title">Resumo</div><div class="chart-summary-grid"><div class="chart-summary-card">'+
-      '<div class="chart-summary-series"><span class="chart-summary-dot" style="background:#dc2626"></span><span>Inadimplência</span></div>'+
-      '<div class="chart-summary-stat"><span>Previsto</span><b>'+money(previstoTotal)+'</b></div>'+
-      '<div class="chart-summary-stat"><span>Arrecadado</span><b>'+money(arrecTotal)+'</b></div>'+
-      '<div class="chart-summary-stat"><span>Inadimplência</span><b>'+money(inadTotal)+' ('+pct.toLocaleString("pt-BR",{maximumFractionDigits:2})+'%)</b></div>'+
-      '<div class="chart-summary-stat"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
-      '<div class="chart-summary-stat"><span>Menor</span><b>'+money(min)+' · '+fmtMonth(calcRows[vals.indexOf(min)][0])+'</b></div>'+
-      '<div class="chart-summary-stat"><span>Maior</span><b>'+money(max)+' · '+fmtMonth(calcRows[vals.indexOf(max)][0])+'</b></div>'+
-    '</div></div>';
-  }
+
+  lineChart(
+    "inadimplenciaChart",
+    calcRows,
+    [1,2,3],
+    ["Arrecadação prevista","Arrecadação executada","Inadimplência Casa Grande"],
+    ["#2563eb","#16a34a","#dc2626"]
+  );
+
+  renderChartSummary(
+    "inadimplenciaSummary",
+    calcRows,
+    [
+      {col:1,label:"Arrecadação prevista",color:"#2563eb"},
+      {col:2,label:"Arrecadação executada",color:"#16a34a"},
+      {col:3,label:"Inadimplência Casa Grande",color:"#dc2626"}
+    ],
+    "Resumo"
+  );
 }
 function renderChartPeriodLabels(){
   // Todos os gráficos exibem exatamente o intervalo escolhido nos filtros,
@@ -1426,7 +1436,7 @@ function render(){
     {col:1,label:"Rendimentos",color:"#2563eb"}
   ],"Resumo","compact-two poupanca-summary");
 
-  renderInadimplencia(poupancaRows); // mesmo padrão visual do gráfico Evolução do saldo devedor
+  renderInadimplencia(rows); // Arrecadação prevista × executada × inadimplência
   renderChartPeriodLabels();
   bindChartClicks();
 
