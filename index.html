@@ -624,7 +624,7 @@ const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "m
 })();
 
 function clone(x){ return JSON.parse(JSON.stringify(x)); }
-function loadData(){ try{ const s=localStorage.getItem(KEY); const d=s?JSON.parse(s):clone(ORIGINAL); if(!d.poupanca) d.poupanca=clone(ORIGINAL.poupanca); if(!d.rendimentos) d.rendimentos=clone(ORIGINAL.rendimentos); return d; }catch(e){ return clone(ORIGINAL); } }
+function loadData(){ try{ const s=localStorage.getItem(KEY); const d=s?JSON.parse(s):clone(ORIGINAL); if(!d.poupanca) d.poupanca=clone(ORIGINAL.poupanca); return d; }catch(e){ return clone(ORIGINAL); } }
 function persistLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(state.data)); }catch(e){} }
 async function loadCloudData(){
   if(!supabaseClient) return {ok:false, reason:"not_configured"};
@@ -634,7 +634,6 @@ async function loadCloudData(){
     if(data && data.data){
       state.data=clone(data.data);
       if(!state.data.poupanca) state.data.poupanca=clone(ORIGINAL.poupanca);
-      if(!state.data.rendimentos) state.data.rendimentos=clone(ORIGINAL.rendimentos);
       persistLocal();
       return {ok:true,updated_at:data.updated_at};
     }
@@ -1058,7 +1057,7 @@ function openChartModal(chartId,title){
   }else if(chartId==="utilitiesChart"){ rows=filtered(state.data.utilities); cols=[1,2]; labels=["Águas do Rio","Light"]; colors=["#0ea5e9","#f59e0b"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="internetGasChart"){ rows=filtered(state.data.internetGas); cols=[1,2]; labels=["INTERNET","GÁS NATURAL"]; colors=["#2563eb","#d97706"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="postalChart"){ rows=filtered(state.data.postal); cols=[1]; labels=["Despesas postais"]; colors=["#dc2626"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
-  }else if(chartId==="homeroChart"){ rows=filtered(state.data.homero); cols=[1,2]; labels=["Adiantamentos","Prestação de contas"]; colors=["#7c3aed","#16a34a"]; chartHtml=expandedBarChart(rows,cols,labels,colors); }else if(chartId==="rendimentosChart"){ const rend=filtered(state.data.rendimentos), pou=filtered(state.data.poupanca), map=Object.fromEntries(pou.map(r=>[r[0],num(r[1])])); rows=rend.map(r=>[r[0],num(r[1]),map[r[0]] ?? 0]); cols=[1,2]; labels=["Rendimentos","Poupança"]; colors=["#2563eb","#16a34a"]; chartHtml=expandedLineChart(rows,cols,labels,colors,2); }
+  }else if(chartId==="homeroChart"){ rows=filtered(state.data.homero); cols=[1,2]; labels=["Adiantamentos","Prestação de contas"]; colors=["#7c3aed","#16a34a"]; chartHtml=expandedBarChart(rows,cols,labels,colors); }else if(chartId==="rendimentosChart"){ const pou=filtered(state.data.poupanca), allP=state.data.poupanca || [], map=Object.fromEntries(pou.map(r=>[r[0],num(r[1])])), rendMap=Object.fromEntries(allP.map((r,i)=>[r[0],num(r[1])-(i>0?num(allP[i-1][1]):num(r[1]))])); rows=pou.map(r=>[r[0],rendMap[r[0]] ?? 0,map[r[0]] ?? 0]); cols=[1,2]; labels=["Rendimentos","Poupança"]; colors=["#2563eb","#16a34a"]; chartHtml=expandedLineChart(rows,cols,labels,colors,2); }
   document.getElementById("chartModalTitle").textContent=title;
   document.getElementById("chartModalSub").textContent="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
   host.innerHTML=chartHtml;
@@ -1292,10 +1291,14 @@ function render(){
   barChart("homeroChart",homeroRows,[1,2],["Adiantamentos","Prestação de contas"],["#7c3aed","#16a34a"]);
   renderHomeroSummary(homeroRows);
   
-  const rendimentosRows=filtered(state.data.rendimentos);
   const poupancaRows=filtered(state.data.poupanca);
   const poupancaByMonth=Object.fromEntries(poupancaRows.map(r=>[r[0],num(r[1])]));
-  const rendimentosChartRows=rendimentosRows.map(r=>[r[0],num(r[1]),poupancaByMonth[r[0]] ?? 0]);
+  const allPoupancaRows=state.data.poupanca || [];
+  const rendimentoByMonth=Object.fromEntries(allPoupancaRows.map((r,i)=>{
+    const anterior=i>0?num(allPoupancaRows[i-1][1]):num(r[1]);
+    return [r[0],num(r[1])-anterior];
+  }));
+  const rendimentosChartRows=poupancaRows.map(r=>[r[0],rendimentoByMonth[r[0]] ?? 0,poupancaByMonth[r[0]] ?? 0]);
   lineChart("rendimentosChart",rendimentosChartRows,[1,2],["Rendimentos","Poupança"],["#2563eb","#16a34a"],2);
   renderChartSummary("rendimentosSummary",rendimentosChartRows,[
     {col:1,label:"Rendimentos",color:"#2563eb"},
@@ -1311,7 +1314,7 @@ const defs={
   postal:{name:"Correios",headers:["Mês","Despesas postais"],types:["text","number"]},
   homero:{name:"Homero",headers:["Mês","Adiantamentos","Prestação de contas"],types:["text","number","number"]},
   internetGas:{name:"Internet & Gás",headers:["Mês","INTERNET","GÁS NATURAL"],types:["text","number","number"]},
-  rendimentos:{name:"Rendimentos",headers:["Mês","Rendimentos"],types:["text","number"]}
+
 };
 function renderEditor(){
   const tabs=document.getElementById("editorTabs");
