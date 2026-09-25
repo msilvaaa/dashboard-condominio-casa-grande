@@ -882,7 +882,7 @@ function lineChart(id, rows, cols, labels, colors, strokeWidth=3.5){
   el.innerHTML=s;
   bindPointTooltips(el, tooltipForChart(id), rows, cols, labels);
 }
-function barChart(id, rows, cols, labels, colors){
+function barChart(id, rows, cols, labels, colors, alignCallouts=false){
   const el=document.getElementById(id), W=560,H=280,pl=52,pr=16,pt=34,pb=42;
   if(!rows.length){el.innerHTML='<text x="50%" y="50%" text-anchor="middle" fill="#667085">Sem dados no período</text>';return}
 
@@ -925,7 +925,9 @@ function barChart(id, rows, cols, labels, colors){
       const labelW=92,labelH=28;
       let bx=cx-labelW/2;
       bx=Math.max(pl+2,Math.min(W-pr-labelW-2,bx));
-      let by=p.tag==="Máx."?y-labelH-12:y+10;
+      let by=alignCallouts
+        ? (p.tag==="Máx." ? 4 : 40)
+        : (p.tag==="Máx." ? y-labelH-12 : y+10);
       by=Math.max(4,Math.min(H-labelH-8,by));
 
       s+=`<line x1="${cx}" y1="${y}" x2="${cx}" y2="${p.tag==="Máx."?by+labelH:by}" stroke="${colors[j]}" stroke-width="1.2" opacity=".55"/>`;
@@ -1047,7 +1049,7 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   return expandedStats(rows,cols,labels,colors)+svg+buildExpandedTable(rows,cols,labels,colors);
 }
 
-function expandedBarChart(rows, cols, labels, colors){
+function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
   const W=1460,H=620,pl=102,pr=42,pt=58,pb=98;
   if(!rows.length) return '<div style="padding:50px;text-align:center;color:#667085">Sem dados no período</div>';
   const vals=cols.map(c=>rows.map(r=>num(r[c])));
@@ -1065,7 +1067,8 @@ function expandedBarChart(rows, cols, labels, colors){
       const x=pl+i*groupW+(groupW-cols.length*barW)/2+j*barW;
       const y=H-pb-h, bw=Math.max(9,barW-4);
       s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="5" fill="'+colors[j]+'"><title>'+fmtMonth(r[0])+' · '+labels[j]+': '+money(v)+'</title></rect>';
-      s+='<text x="'+(x+bw/2)+'" y="'+Math.max(pt+12,y-8)+'" text-anchor="middle" font-size="10" font-weight="800" fill="'+colors[j]+'">'+compactMoney(v)+'</text>';
+      const labelY=alignCallouts ? Math.max(pt+14, Math.min(...cols.map(cc=>H-pb-(H-pt-pb)*num(r[cc])/max))-8) : Math.max(pt+12,y-8);
+      s+='<text x="'+(x+bw/2)+'" y="'+labelY+'" text-anchor="middle" font-size="10" font-weight="800" fill="'+colors[j]+'">'+compactMoney(v)+'</text>';
     });
     const cx=pl+i*groupW+groupW/2;
     s+='<line x1="'+cx+'" y1="'+(H-pb)+'" x2="'+cx+'" y2="'+(H-pb+5)+'" stroke="#cfd6df"/>';
@@ -1108,7 +1111,7 @@ function openChartModal(chartId,title){
     cols=[1,2,3];
     labels=["Arrecadação prevista","Arrecadação executada","Inadimplência Casa Grande"];
     colors=["#2563eb","#16a34a","#dc2626"];
-    chartHtml=expandedBarChart(rows,cols,labels,colors);
+    chartHtml=expandedBarChart(rows,cols,labels,colors,true);
   }
   document.getElementById("chartModalTitle").textContent=title;
   document.getElementById("chartModalSub").textContent="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
@@ -1359,6 +1362,7 @@ function renderInadimplencia(rows){
     [1,2,3],
     ["Arrecadação prevista","Arrecadação executada","Inadimplência Casa Grande"],
     ["#2563eb","#16a34a","#dc2626"]
+    true
   );
 
   renderChartSummary(
