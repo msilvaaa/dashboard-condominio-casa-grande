@@ -1235,7 +1235,8 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
       // Para Poupança, o "Total" é sempre o valor do último mês dentro do filtro selecionado.
       // Rendimentos continua sendo a soma dos rendimentos somente do intervalo selecionado.
       const isPoupanca=item.col===2;
-      const totalValue=isPoupanca ? last : total;
+      const selectedEndRow=isPoupanca ? rows.find(r=>r[0]===state.end) : null;
+      const totalValue=isPoupanca ? (selectedEndRow ? num(selectedEndRow[item.col]) : null) : total;
       return '<div class="chart-summary-card">'+
         '<div class="chart-summary-series" title="'+esc(item.label)+'"><span class="chart-summary-dot" style="background:'+item.color+'"></span><span>'+esc(item.label)+'</span></div>'+
         '<div class="chart-summary-stat"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
