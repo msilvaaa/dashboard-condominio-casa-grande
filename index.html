@@ -528,7 +528,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
     </section>
     <section class="card">
       <div class="title-row"><div><div class="title">Inadimplência Casa Grande</div><div class="tiny">Evolução mensal da inadimplência no período selecionado</div></div></div>
-      <div class="chart-wrap chart-area"><div id="inadimplenciaTip" class="chart-tooltip"></div><svg id="inadimplenciaChart" viewBox="0 0 920 350" aria-label="Gráfico da Inadimplência Casa Grande"></svg></div>
+      <div class="chart-wrap chart-area"><div id="inadimplenciaTip" class="chart-tooltip"></div><svg id="inadimplenciaChart" viewBox="0 0 560 280" aria-label="Gráfico da Inadimplência Casa Grande"></svg></div>
       <div id="inadimplenciaSummary" class="chart-summary"></div>
       <div class="legend"><span><i class="dot" style="background:#dc2626"></i>Inadimplência Casa Grande</span></div>
     </section>
@@ -1108,7 +1108,7 @@ function openChartModal(chartId,title){
     cols=[1,2,3];
     labels=["Arrecadação prevista","Arrecadação executada","Inadimplência Casa Grande"];
     colors=["#2563eb","#16a34a","#dc2626"];
-    chartHtml=expandedLineChart(rows,cols,labels,colors);
+    chartHtml=expandedBarChart(rows,cols,labels,colors);
   }
   document.getElementById("chartModalTitle").textContent=title;
   document.getElementById("chartModalSub").textContent="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
@@ -1353,7 +1353,7 @@ function renderInadimplencia(rows){
     return [month,previsto,executada,inadimplencia];
   });
 
-  lineChart(
+  barChart(
     "inadimplenciaChart",
     calcRows,
     [1,2,3],
