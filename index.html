@@ -25,7 +25,7 @@ h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{co
 .insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.insight{padding:12px;border-radius:14px;background:var(--panel2);border:1px solid var(--line)}.insight b{display:block;font-size:13px;margin-bottom:3px}.insight span{font-size:12px;color:var(--muted);line-height:1.45}
 .table-card{overflow:hidden}.table-scroll{overflow:auto;max-height:440px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}th:first-child,td:first-child{text-align:left}thead th{position:sticky;top:0;background:#f8fafc;color:#475467;font-size:11px;text-transform:uppercase;letter-spacing:.04em;z-index:2}tbody tr:hover{background:#fbfdff}
 .pos{color:var(--green);font-weight:800}.neg{color:var(--red);font-weight:800}
-.footer-note{font-size:11px;color:var(--muted);margin-top:12px}.chart-area{position:relative}.chart-period-label{font-size:11px;font-weight:800;fill:#1d4ed8}.chart-period-label-bg{fill:#eef5ff}
+.footer-note{font-size:11px;color:var(--muted);margin-top:12px}.chart-area{position:relative}.chart-period-label{font-size:11px;font-weight:800;fill:#1d4ed8}.chart-period-label-bg{fill:#eef5ff}.chart-period-inline{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:4px 12px;border-radius:999px;background:#eef5ff;color:#1d4ed8;font-size:11px;font-weight:800;line-height:1;white-space:nowrap;margin-left:8px}
 .chart-summary{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .chart-summary-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#667085;margin-bottom:9px}
 .chart-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.chart-summary.compact-two .chart-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-summary.compact-two .chart-summary-card{min-width:0;padding:10px 12px}.chart-summary.single-series .chart-summary-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -1296,33 +1296,29 @@ function monthRangeLabel(start,end){
 }
 function setChartPeriodLabel(chartId,start,end){
   const svg=document.getElementById(chartId); if(!svg) return;
-  const parts=(svg.getAttribute("viewBox")||"0 0 920 350").split(/\s+/).map(Number), W=parts[2]||920;
   const label=monthRangeLabel(start,end);
-  let group=svg.querySelector(".chart-period-label-group");
-  if(!group){
-    group=document.createElementNS("http://www.w3.org/2000/svg","g");
-    group.setAttribute("class","chart-period-label-group");
-    group.setAttribute("pointer-events","none");
-    const bg=document.createElementNS("http://www.w3.org/2000/svg","rect");
-    bg.setAttribute("class","chart-period-label-bg");
-    bg.setAttribute("rx","14"); bg.setAttribute("ry","14");
-    const text=document.createElementNS("http://www.w3.org/2000/svg","text");
-    text.setAttribute("class","chart-period-label");
-    text.setAttribute("text-anchor","middle");
-    group.appendChild(bg); group.appendChild(text); svg.appendChild(group);
+  const section=svg.closest("section.card");
+  const titleRow=section?.querySelector(".title-row");
+  if(!titleRow) return;
+
+  let node=titleRow.querySelector(".chart-period-inline");
+  if(!node){
+    node=document.createElement("span");
+    node.className="chart-period-inline";
+    const right=titleRow.lastElementChild;
+    if(right && right.tagName!=="SPAN" && right.children?.length){
+      right.appendChild(node);
+    }else{
+      titleRow.appendChild(node);
+    }
   }
-  const bg=group.querySelector(".chart-period-label-bg");
-  const text=group.querySelector(".chart-period-label");
-  const width=Math.max(188,Math.min(330,label.length*6.1+28));
-  const height=24, x=W-20-width, y=3;
-  bg.setAttribute("x",String(x)); bg.setAttribute("y",String(y));
-  bg.setAttribute("width",String(width)); bg.setAttribute("height",String(height));
-  bg.setAttribute("fill","#eef5ff");
-  text.setAttribute("x",String(x+width/2)); text.setAttribute("y",String(y+16));
-  text.setAttribute("font-size","11"); text.setAttribute("font-weight","800");
-  text.setAttribute("fill","#1d4ed8");
-  text.textContent=label;
+  node.textContent=label;
+
+  // Remove o modelo antigo que ficava dentro da área do gráfico.
+  svg.querySelector(".chart-period-label-group")?.remove();
+  svg.querySelector(".chart-period-label")?.remove();
 }
+
 function renderInadimplencia(rows){
   const mainRows=filtered(state.data.main), byMonth=new Map(mainRows.map(r=>[String(r[0]),num(r[2])]));
   const calcRows=(rows||[]).map(r=>{
