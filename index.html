@@ -1305,12 +1305,9 @@ function setChartPeriodLabel(chartId,start,end){
   if(!node){
     node=document.createElement("span");
     node.className="chart-period-inline";
-    const right=titleRow.lastElementChild;
-    if(right && right.tagName!=="SPAN" && right.children?.length){
-      right.appendChild(node);
-    }else{
-      titleRow.appendChild(node);
-    }
+    // Sempre coloca o período como elemento próprio do title-row,
+    // garantindo alinhamento à direita em todos os gráficos.
+    titleRow.appendChild(node);
   }
   node.textContent=label;
 
