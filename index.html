@@ -1300,11 +1300,12 @@ function render(){
   renderHomeroSummary(homeroRows);
   
   const poupancaRows=filtered(state.data.poupanca);
-  const poupancaByMonth=Object.fromEntries(poupancaRows.map(r=>[r[0],r[0]==="2025-09"?0:num(r[1])]));
+  const poupancaByMonth=Object.fromEntries(poupancaRows.map(r=>[r[0],num(r[1])]));
   const allPoupancaRows=state.data.poupanca || [];
   const rendimentoByMonth=Object.fromEntries(allPoupancaRows.map((r,i)=>{
     const anterior=i>0?num(allPoupancaRows[i-1][1]):num(r[1]);
-    return [r[0],num(r[1])-anterior];
+    const rendimento=r[0]==="2025-09"?0:num(r[1])-anterior;
+    return [r[0],rendimento];
   }));
   const rendimentosChartRows=poupancaRows.map(r=>[r[0],rendimentoByMonth[r[0]] ?? 0,poupancaByMonth[r[0]] ?? 0]);
   lineChart("rendimentosChart",rendimentosChartRows,[1,2],["Rendimentos","Poupança"],["#2563eb","#16a34a"],2);
