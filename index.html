@@ -1232,14 +1232,16 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
     const max=Math.max(...values), min=Math.min(...values), last=values.at(-1);
     const total=values.reduce((a,b)=>a+b,0);
     if(extraClass.includes("poupanca-summary")){
-      const totalLabel=item.col===2 ? "Total" : "Total";
-      const totalValue=item.col===2 ? last : total;
+      // Para Poupança, o "Total" é sempre o valor do último mês dentro do filtro selecionado.
+      // Rendimentos continua sendo a soma dos rendimentos somente do intervalo selecionado.
+      const isPoupanca=item.col===2;
+      const totalValue=isPoupanca ? last : total;
       return '<div class="chart-summary-card">'+
         '<div class="chart-summary-series" title="'+esc(item.label)+'"><span class="chart-summary-dot" style="background:'+item.color+'"></span><span>'+esc(item.label)+'</span></div>'+
         '<div class="chart-summary-stat"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
         '<div class="chart-summary-stat"><span>Maior valor</span><b>'+money(max)+'</b></div>'+
         '<div class="chart-summary-stat"><span>Menor valor</span><b>'+money(min)+'</b></div>'+
-        '<div class="chart-summary-stat"><span>'+totalLabel+'</span><b>'+money(totalValue)+'</b></div>'+
+        '<div class="chart-summary-stat"><span>Total</span><b>'+money(totalValue)+'</b></div>'+
       '</div>';
     }
     return '<div class="chart-summary-card">'+
