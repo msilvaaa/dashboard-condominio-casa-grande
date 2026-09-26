@@ -681,7 +681,7 @@ async function loadCloudData(){
     if(error) throw error;
     if(data && data.data){
       state.data=clone(data.data);
-      if(!state.data.poupanca) state.data.poupanca=clone(ORIGINAL.poupanca);
+      Object.keys(ORIGINAL).forEach(k=>{ if(!Array.isArray(state.data[k])) state.data[k]=clone(ORIGINAL[k]); });
       persistLocal();
       return {ok:true,updated_at:data.updated_at};
     }
@@ -1842,7 +1842,7 @@ document.getElementById("endMonth").addEventListener("change",applyPeriod);
 document.querySelectorAll(".period-quick-btn").forEach(btn=>btn.addEventListener("click",()=>setQuickRange(btn.dataset.range)));
 fillPeriodSelectors();
 render();
-bootCloudSync();
+window.addEventListener("load",()=>bootCloudSync());
 </script>
 </body>
 </html>
