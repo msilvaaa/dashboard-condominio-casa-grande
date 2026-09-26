@@ -443,7 +443,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
   }
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script>
   try{
     if(localStorage.getItem("dashboard_theme")==="dark"){
@@ -640,8 +640,22 @@ const KEY = "dashboard_saldo_devedor_v1";
 // Nunca coloque a chave SECRET (sb_secret_...) neste arquivo.
 const SUPABASE_URL = "https://yayfspvqwuefbtiyttnr.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_iOxhPw26ASUO9WaNcc7HfA_dR1XjyKp";
-const supabaseReady = SUPABASE_URL.startsWith("https://") && SUPABASE_PUBLISHABLE_KEY.startsWith("sb_") && !SUPABASE_URL.includes("COLE_AQUI") && !SUPABASE_PUBLISHABLE_KEY.includes("COLE_AQUI") && !!window.supabase && typeof window.supabase.createClient==="function";
-const supabaseClient = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+let supabaseClient = null;
+function initSupabaseClient(){
+  if(supabaseClient) return true;
+  if(!window.supabase || typeof window.supabase.createClient!=="function") return false;
+  try{
+    supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+    supabaseClient.auth.onAuthStateChange((event)=>{
+      if(event==="PASSWORD_RECOVERY") setTimeout(openPasswordRecovery,0);
+    });
+    return true;
+  }catch(e){
+    console.error("Supabase init error:",e);
+    supabaseClient=null;
+    return false;
+  }
+}
 const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "main"};
 (function syncInitialPeriod(){
   const months=allDataMonths();
@@ -726,8 +740,8 @@ function startCloudAutoRefresh(){
 }
 
 async function bootCloudSync(){
-  if(!supabaseClient){
-    console.warn("Supabase ainda não configurado. Preencha SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY.");
+  if(!initSupabaseClient()){
+    console.warn("Supabase ainda não está disponível. Os gráficos continuam funcionando localmente.");
     return;
   }
   const result=await refreshCloudData();
@@ -1688,14 +1702,6 @@ async function saveNewPassword(){
   try{sessionStorage.setItem("dashboard_edit_auth","0");}catch(e){}
   alert("Senha alterada com sucesso! Agora clique em Editar dados e entre com a nova senha.");
 }
-if(supabaseClient){
-  supabaseClient.auth.onAuthStateChange((event)=>{
-    if(event==="PASSWORD_RECOVERY"){
-      setTimeout(openPasswordRecovery,0);
-    }
-  });
-}
-
 function updateLoggedUserLine(user){
   const line=document.getElementById("loggedUserLine");
   const name=document.getElementById("loggedUserName");
