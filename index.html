@@ -653,7 +653,12 @@ const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "m
 })();
 
 function clone(x){ return JSON.parse(JSON.stringify(x)); }
-function loadData(){ try{ const s=localStorage.getItem(KEY); const d=s?JSON.parse(s):clone(ORIGINAL); if(!d.poupanca) d.poupanca=clone(ORIGINAL.poupanca); if(!d.inadimplencia) d.inadimplencia=clone(ORIGINAL.inadimplencia); return d; }catch(e){ return clone(ORIGINAL); } }
+function loadData(){ try{
+  const s=localStorage.getItem(KEY);
+  const d=s?JSON.parse(s):clone(ORIGINAL);
+  Object.keys(ORIGINAL).forEach(k=>{ if(!Array.isArray(d[k])) d[k]=clone(ORIGINAL[k]); });
+  return d;
+}catch(e){ return clone(ORIGINAL); } }
 function persistLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(state.data)); }catch(e){} }
 async function loadCloudData(){
   if(!supabaseClient) return {ok:false, reason:"not_configured"};
@@ -747,7 +752,7 @@ function compactMoney(v){
 }
 function num(v){ const n=Number(v); return Number.isFinite(n)?n:0; }
 function fmtMonth(s){ const [y,m]=s.split("-"); const names=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]; return names[Number(m)-1]+"/"+y.slice(2); }
-function filtered(rows){ return rows.filter(r=>r[0]>=state.start && r[0]<=state.end); }
+function filtered(rows){ return Array.isArray(rows) ? rows.filter(r=>r && r[0]>=state.start && r[0]<=state.end) : []; }
 
 function withSaldoEvolution(rows){
   return rows.map((r,i)=>{
@@ -1504,7 +1509,8 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape" && document.getElem
 
 function allDataMonths(){
   const set=new Set();
-  Object.values(state.data).forEach(rows=>{
+  Object.values(state.data || {}).forEach(rows=>{
+    if(!Array.isArray(rows)) return;
     rows.forEach(r=>{
       if(r && /^\d{4}-\d{2}$/.test(String(r[0]))) set.add(String(r[0]));
     });
