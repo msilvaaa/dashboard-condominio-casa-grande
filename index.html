@@ -1781,7 +1781,8 @@ document.getElementById("resetData").addEventListener("click",async()=>{if(confi
 document.getElementById("exportJson").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(state.data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="dados-dashboard-saldo-devedor.json";a.click();URL.revokeObjectURL(a.href)});
 document.getElementById("importJson").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());if(!obj.main||!obj.utilities||!obj.postal||!obj.homero)throw new Error();state.data=obj;const result=await persist();render();renderEditor();toast(result.ok?"Dados importados e salvos na nuvem.":"Dados importados localmente; não foi possível salvar na nuvem.")}catch(err){toast("Arquivo JSON inválido.")}e.target.value=""});
 document.getElementById("editorModal").addEventListener("click",e=>{if(e.target.id==="editorModal")document.getElementById("editorModal").classList.remove("open")});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeLogin();}});\nif(new URLSearchParams(window.location.search).get("token")) setTimeout(()=>{closeLogin();document.getElementById("passwordRecoveryModal").classList.add("open")},50);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeLogin();}});
+if(new URLSearchParams(window.location.search).get("token")) setTimeout(()=>{closeLogin();document.getElementById("passwordRecoveryModal").classList.add("open")},50);
 
 document.getElementById("startMonth").addEventListener("change",applyPeriod);
 document.getElementById("endMonth").addEventListener("change",applyPeriod);
