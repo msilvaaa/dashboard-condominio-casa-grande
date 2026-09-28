@@ -637,18 +637,47 @@ const ORIGINAL = {"main": [["2025-01", "-68498.96", "200782.77", "9444.40", "207
 const KEY = "dashboard_saldo_devedor_v1";
 // Neon Auth is accessed through the same-origin /api/auth proxy.
 // Dashboard data is read/written through /api/dashboard-data.
-const NEON_AUTH_BASE="/api/auth";
-async function neonAuthRequest(path, options={}){
-  const opts={credentials:"include",...options,headers:{...(options.headers||{})}};
-  if(opts.body && !opts.headers["Content-Type"]) opts.headers["Content-Type"]="application/json";
-  const response=await fetch(NEON_AUTH_BASE+"/"+path.replace(/^\//,""),opts);
-  const payload=await response.json().catch(()=>({}));
-  if(!response.ok){
-    const error=new Error(payload?.message||payload?.error||("HTTP "+response.status));
-    error.status=response.status;
-    throw error;
+const NEON_AUTH_URL="https://ep-weathered-smoke-b4g1qnj9.neonauth.c-6.us-east-2.aws.neon.tech/neondb/auth";
+let neonAuthClient=null;
+async function getNeonAuthClient(){
+  if(!neonAuthClient){
+    const mod=await import("https://esm.sh/@neondatabase/auth@latest?bundle");
+    neonAuthClient=mod.createAuthClient(NEON_AUTH_URL);
   }
-  return payload;
+  return neonAuthClient;
+}
+async function neonAuthRequest(path,options={}){
+  const auth=await getNeonAuthClient();
+  let body={};
+  if(options.body){
+    try{body=typeof options.body==="string"?JSON.parse(options.body):options.body;}catch(e){body={};}
+  }
+  if(path==="sign-in/email"){
+    const result=await auth.signIn.email(body);
+    if(result?.error) throw Object.assign(new Error(result.error.message||"Authentication failed"),{status:result.error.status||400});
+    return result?.data||result;
+  }
+  if(path==="get-session"){
+    const result=await auth.getSession();
+    if(result?.error) throw Object.assign(new Error(result.error.message||"Session error"),{status:result.error.status||400});
+    return result?.data||result;
+  }
+  if(path==="sign-out"){
+    const result=await auth.signOut();
+    if(result?.error) throw Object.assign(new Error(result.error.message||"Sign out failed"),{status:result.error.status||400});
+    return result?.data||result;
+  }
+  if(path==="request-password-reset"){
+    const result=await auth.requestPasswordReset(body);
+    if(result?.error) throw Object.assign(new Error(result.error.message||"Password reset failed"),{status:result.error.status||400});
+    return result?.data||result;
+  }
+  if(path==="reset-password"){
+    const result=await auth.resetPassword(body);
+    if(result?.error) throw Object.assign(new Error(result.error.message||"Password reset failed"),{status:result.error.status||400});
+    return result?.data||result;
+  }
+  throw new Error("Auth method not configured: "+path);
 }
 const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "main"};
 (function syncInitialPeriod(){
