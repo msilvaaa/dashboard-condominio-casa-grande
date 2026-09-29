@@ -1656,6 +1656,13 @@ function printDashboard(){
 document.getElementById("printDashboard").addEventListener("click",printDashboard);
 applyTheme();
 
+function updateLoggedUserLine(user){
+  const line=document.getElementById('loggedUserLine');
+  const name=document.getElementById('loggedUserName');
+  if(name) name.textContent=user?.email||user?.name||'—';
+  if(line) line.style.display='flex';
+}
+
 function openPasswordRecovery(){
   const modal=document.getElementById("passwordRecoveryModal");
   const error=document.getElementById("passwordRecoveryError");
