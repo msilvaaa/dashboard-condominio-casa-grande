@@ -1682,6 +1682,7 @@ async function sendPasswordRecovery(){
   if(!email){error.textContent="Digite seu e-mail primeiro.";document.getElementById("loginUser").focus();return}
   error.textContent="Enviando e-mail de recuperação...";
   try{
+    try{localStorage.setItem("dashboard_login_username",email)}catch(e){}
     await neonAuthRequest("request-password-reset",{method:"POST",body:JSON.stringify({email,redirectTo:"https://dashboardsaldodevedor.vercel.app/"})});
     error.textContent="E-mail enviado! Verifique sua caixa de entrada.";
   }catch(e){
@@ -1701,8 +1702,27 @@ async function saveNewPassword(){
   const oldText=btn.textContent;btn.textContent="Salvando...";error.textContent="";
   try{
     await neonAuthRequest("reset-password",{method:"POST",body:JSON.stringify({newPassword:password,token})});
-    closePasswordRecovery();
     history.replaceState({},document.title,window.location.pathname);
+    const email=(()=>{try{return localStorage.getItem("dashboard_login_username")||""}catch(e){return ""}})();
+    if(email){
+      try{
+        await neonAuthRequest("sign-in/email",{method:"POST",body:JSON.stringify({email,password:password,rememberMe:true})});
+        const session=await neonAuthRequest("get-session",{method:"GET"});
+        const user=session?.user||session?.session?.user;
+        if(!user) throw new Error("Sessão não criada após redefinir a senha");
+        try{sessionStorage.setItem("dashboard_edit_auth","1")}catch(e){}
+        updateLoggedUserLine(user);
+        closePasswordRecovery();
+        document.getElementById("editorModal").classList.add("open");
+        renderEditor();
+        toast("Senha alterada e acesso autorizado.");
+        return;
+      }catch(loginErr){
+        error.textContent="Senha alterada, mas o login falhou: "+(loginErr?.message||"erro desconhecido");
+        return;
+      }
+    }
+    closePasswordRecovery();
     alert("Senha alterada com sucesso! Agora entre com a nova senha.");
   }catch(e){error.textContent="Não foi possível alterar a senha: "+(e.message||"erro desconhecido")}
   finally{btn.disabled=false;btn.textContent=oldText}
@@ -1731,7 +1751,8 @@ function openLogin(){
   const err=document.getElementById("loginError");
   if(!modal)return;
   err.textContent="";
-  user.value="";pass.value="";
+  try{user.value=localStorage.getItem("dashboard_login_username")||""}catch(e){user.value=""}
+  pass.value="";
   modal.classList.add("open");modal.setAttribute("aria-hidden","false");
   setTimeout(()=>user.focus(),50);
 }
@@ -1755,7 +1776,8 @@ async function attemptLogin(){
     document.getElementById("editorModal").classList.add("open");renderEditor();
     toast("Acesso autorizado e conectado ao Neon.");
   }catch(e){
-    err.textContent="E-mail ou senha incorretos.";
+    const detail=e?.message?String(e.message):"Falha ao autenticar";
+    err.textContent=e?.status?("Falha no Neon Auth ("+e.status+"): "+detail):detail;
     document.getElementById("loginPass").select();
   }
 }
