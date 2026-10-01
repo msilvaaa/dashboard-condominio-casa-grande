@@ -1661,7 +1661,9 @@ async function sendPasswordRecovery(){
   error.textContent="Enviando e-mail de recuperação...";
   try{
     try{localStorage.setItem("dashboard_login_username",email)}catch(e){}
-    await neonAuthRequest("request-password-reset",{method:"POST",body:JSON.stringify({email,redirectTo:"https://dashboardsaldodevedor.vercel.app/"})});
+    const response=await fetch("/api/auth/request-password-reset",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"include",body:JSON.stringify({email,redirectTo:"https://dashboardsaldodevedor.vercel.app/"})});
+    const payload=await response.json().catch(()=>({}));
+    if(!response.ok) throw new Error(payload?.message||payload?.error||("HTTP "+response.status));
     error.textContent="E-mail enviado! Verifique sua caixa de entrada.";
   }catch(e){
     error.textContent="Não foi possível enviar: "+(e.message||"verifique a configuração de e-mail do Neon.");
