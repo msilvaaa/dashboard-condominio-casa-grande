@@ -1073,7 +1073,7 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   const zero=y(0);
   if(zero>=pt&&zero<=H-pb) s+='<line x1="'+pl+'" y1="'+zero+'" x2="'+(W-pr)+'" y2="'+zero+'" stroke="#98a2b3" stroke-width="1.5" stroke-dasharray="7 6"/>';
 
-  // Primeiro desenha todas as linhas e pontos.
+  // Desenha primeiro as linhas e pontos.
   series.forEach((arr,si)=>{
     s+='<path d="'+arr.map((v,i)=>(i?'L':'M')+x(i)+' '+y(v)).join(' ')+'" fill="none" stroke="'+colors[si]+'" stroke-width="'+strokeWidth+'" stroke-linecap="round" stroke-linejoin="round"/>';
     arr.forEach((v,i)=>{
@@ -1082,27 +1082,39 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
     });
   });
 
-  // Depois desenha todas as etiquetas por cima das linhas para nunca ficarem escondidas.
+  // Etiquetas: série 1 sempre acima e série 2 sempre abaixo, com deslocamento lateral grande.
   series.forEach((arr,si)=>{
     arr.forEach((v,i)=>{
       const cx=x(i), cy=y(v);
-      const text=compactMoney(v), labelW=26, labelH=Math.max(82,Math.min(112,9.5*text.length+28));
-      // Série principal (ex.: linha verde da arrecadação) fica acima e vertical, lendo de baixo para cima.
-      let above = cols.length===1 ? i%2===0 : si===0;
-      let bx=cx-labelW/2;
-      let by=above ? cy-labelH-14 : cy+14;
+      const text=compactMoney(v);
+      const labelW=28;
+      const labelH=Math.max(84,Math.min(116,9.5*text.length+30));
 
-      // Garante que a caixa permaneça dentro da área do gráfico.
-      if(by<pt+2){ above=false; by=cy+14; }
-      if(by+labelH>H-pb-2){ above=true; by=cy-labelH-14; }
+      let bx=cx-labelW/2;
+      let by;
+
+      if(cols.length>1){
+        if(si===0){
+          by=cy-labelH-24;
+          bx=cx-labelW/2-22;
+        }else{
+          by=cy+24;
+          bx=cx-labelW/2+22;
+        }
+      }else{
+        const above=i%2===0;
+        by=above?cy-labelH-20:cy+20;
+      }
+
+      // Ajustes de segurança para nunca sair da área útil.
+      if(by<pt+2) by=cy+20;
+      if(by+labelH>H-pb-2) by=cy-labelH-20;
       by=Math.max(pt+2,Math.min(H-pb-labelH-2,by));
 
-      // Pequeno deslocamento lateral em gráficos com duas séries para separar as etiquetas.
-      const sideNudge=cols.length>1 ? (si===0 ? -6 : 6) : 0;
-      bx+=sideNudge;
       bx=Math.max(pl+2,Math.min(W-pr-labelW-2,bx));
 
-      const lx=cx, ly=above ? by+labelH : by;
+      const aboveFinal=by<cy;
+      const lx=cx, ly=aboveFinal?by+labelH:by;
       s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+lx+'" y2="'+ly+'" stroke="'+colors[si]+'" stroke-width="1.2" opacity=".5"/>';
       s+='<rect x="'+bx+'" y="'+by+'" width="'+labelW+'" height="'+labelH+'" rx="8" fill="#ffffff" stroke="'+colors[si]+'" stroke-width="1.2"/>';
       s+='<text x="'+(bx+labelW/2)+'" y="'+(by+labelH/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="900" fill="#172033" transform="rotate(-90 '+(bx+labelW/2)+' '+(by+labelH/2)+')">'+text+'</text>';
