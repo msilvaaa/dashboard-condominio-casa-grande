@@ -1575,11 +1575,15 @@ function renderEditor(){
     return `<td><input data-r="${i}" data-c="${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" value="${esc(value)}"${(autoArrec||autoEvol||autoInad)?" readonly aria-readonly=\"true\"":""}></td>`;
   }).join("")}${state.editorTab==="inadimplencia"?"":"<td><button type=\"button\" class=\"btn danger small-delete\" data-del=\""+i+"\" style=\"padding:7px 9px\">Excluir</button></td>"}</tr>`).join("");
 
+  const latestInad=state.editorTab==="inadimplencia" ? rows[rows.length-1] : null;
+  const latestInadLabel=latestInad
+    ? "Último mês calculado: "+fullMonthLabel(String(latestInad[0]))+" · Inadimplência: "+formatEditorNumber(latestInad[1])
+    : "A inadimplência é calculada automaticamente.";
+
   document.getElementById("editorBody").innerHTML=`
     <div class="editor-grid">
       ${state.editorTab==="inadimplencia"
-        ? `<div><label>Mês</label><input id="new_0" type="text" inputmode="text" placeholder="2026-09"></div>
-           <div><label>Inadimplência Casa Grande</label><input id="new_1" type="text" readonly aria-readonly="true"></div>`
+        ? `<div style="grid-column:1/-1;padding:10px 12px;border:1px solid #dbe5f1;border-radius:10px;background:#f8fafc;font-size:12px;font-weight:600;color:#344054">${esc(latestInadLabel)}</div>`
         : d.headers.map((h,j)=>{
             const auto=state.editorTab==="main"&&(j===4||j===6);
             if(auto) return "";
@@ -1589,7 +1593,6 @@ function renderEditor(){
     </div>
     ${state.editorTab==="inadimplencia" ? '<div style="font-size:11px;color:#667085;margin:6px 0 10px">Calculada automaticamente: Arrecadação prevista − Arrecadação executada.</div>' : ""}
     <div class="table-scroll" style="max-height:360px"><table class="edit-table"><thead><tr>${head}<th></th></tr></thead><tbody>${body}</tbody></table></div>`;
-
   const updateNewArrecadacao=()=>{
     if(state.editorTab!=="main") return;
     const cond=num(normalizeEditorNumber(document.getElementById("new_2")?.value||"0"));
@@ -1597,22 +1600,10 @@ function renderEditor(){
     const field=document.getElementById("new_4");
     if(field) field.value=formatEditorNumber(cond+garagem);
   };
-  const updateNewInadimplencia=()=>{
-    if(state.editorTab!=="inadimplencia") return;
-    const month=document.getElementById("new_0")?.value?.trim()||"";
-    const field=document.getElementById("new_1");
-    const main=(state.data.main||[]).find(r=>String(r[0])===month);
-    if(field) field.value=main ? formatEditorNumber(expectedRevenueForMonth(month)-num(normalizeEditorNumber(main[4]||"0"))) : "";
-  };
-
   if(state.editorTab==="main"){
     updateNewArrecadacao();
     document.getElementById("new_2")?.addEventListener("input",updateNewArrecadacao);
     document.getElementById("new_5")?.addEventListener("input",updateNewArrecadacao);
-  }
-  if(state.editorTab==="inadimplencia"){
-    document.getElementById("new_0")?.addEventListener("input",updateNewInadimplencia);
-    updateNewInadimplencia();
   }
 
   document.getElementById("addRow")?.addEventListener("click",()=>{
