@@ -1055,8 +1055,8 @@ function buildExpandedTable(rows, cols, labels, colors){
   return out;
 }
 
-function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[],labelW=26){
-  const labelH=Math.max(82,Math.min(116,9.5*text.length+30));
+function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[],labelW=38){
+  const labelH=Math.max(98,Math.min(132,11*text.length+34));
   const gap=16;
   const candidates=[];
   const xOffsets=[0,-34,34,-62,62,-90,90];
@@ -1135,13 +1135,13 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
       const cx=x(i), cy=y(v);
       const text=compactMoney(v);
       const preferred=cols.length>1 ? (si===0?"above":"below") : (i%2===0?"above":"below");
-      const pos=expandedVerticalLabelPlacement(cx,cy,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},preferred,used,26);
+      const pos=expandedVerticalLabelPlacement(cx,cy,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},preferred,used,38);
       used.push(pos);
 
       const lx=cx, ly=pos.dir==="above"?pos.by+pos.height:pos.by;
       s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+lx+'" y2="'+ly+'" stroke="'+colors[si]+'" stroke-width="1.2" opacity=".5"/>';
       s+='<rect x="'+pos.bx+'" y="'+pos.by+'" width="'+pos.width+'" height="'+pos.height+'" rx="8" fill="#ffffff" stroke="'+colors[si]+'" stroke-width="1.2"/>';
-      s+='<text x="'+(pos.bx+pos.width/2)+'" y="'+(pos.by+pos.height/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="900" fill="#172033" transform="rotate(-90 '+(pos.bx+pos.width/2)+' '+(pos.by+pos.height/2)+')">'+text+'</text>';
+      s+='<text x="'+(pos.bx+pos.width/2)+'" y="'+(pos.by+pos.height/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="900" fill="#172033" transform="rotate(-90 '+(pos.bx+pos.width/2)+' '+(pos.by+pos.height/2)+')">'+text+'</text>';
     });
   });
 
@@ -1185,13 +1185,13 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
       const x=pl+i*groupW+(groupW-cols.length*barW)/2+j*barW;
       const y=H-pb-h, bw=Math.max(9,barW-4), cx=x+bw/2;
       const text=compactMoney(v);
-      const pos=expandedVerticalLabelPlacement(cx,y,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},"above",used,22);
+      const pos=expandedVerticalLabelPlacement(cx,y,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},"above",used,34);
       used.push(pos);
 
       const ly=pos.by+pos.height;
       s+='<line x1="'+cx+'" y1="'+y+'" x2="'+cx+'" y2="'+ly+'" stroke="'+colors[j]+'" stroke-width="1.1" opacity=".4"/>';
       s+='<rect x="'+pos.bx+'" y="'+pos.by+'" width="'+pos.width+'" height="'+pos.height+'" rx="7" fill="#ffffff" stroke="'+colors[j]+'" stroke-width="1.1"/>';
-      s+='<text x="'+(pos.bx+pos.width/2)+'" y="'+(pos.by+pos.height/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="850" fill="#172033" transform="rotate(-90 '+(pos.bx+pos.width/2)+' '+(pos.by+pos.height/2)+')">'+text+'</text>';
+      s+='<text x="'+(pos.bx+pos.width/2)+'" y="'+(pos.by+pos.height/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="900" fill="#172033" transform="rotate(-90 '+(pos.bx+pos.width/2)+' '+(pos.by+pos.height/2)+')">'+text+'</text>';
     });
   });
 
