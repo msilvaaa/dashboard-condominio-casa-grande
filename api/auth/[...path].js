@@ -18,7 +18,12 @@ function rewriteSetCookie(value) {
 }
 
 module.exports = async function handler(req, res) {
-  const path = normalizePath(req.query?.path);
+  let path = normalizePath(req.query?.path);
+  if (!path && req.url) {
+    const pathname = String(req.url).split("?")[0];
+    const prefix = "/api/auth/";
+    if (pathname.startsWith(prefix)) path = pathname.slice(prefix.length).replace(/^\\/+|\\/+$/g, "");
+  }
   if (!path) return res.status(400).json({ error: "Missing auth path" });
 
   const target = NEON_AUTH_URL.replace(/\/$/, "") + "/" + path;
