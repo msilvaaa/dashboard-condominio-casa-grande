@@ -1127,10 +1127,13 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
     });
   });
 
-  // Números horizontais e grandes. Cada etiqueta é posicionada sem sobreposição.
+  // Números horizontais e grandes. Em intervalos longos, mostra os valores de 2 em 2 meses
+  // para preservar a leitura sem eliminar os pontos do gráfico.
   const used=[];
+  const labelStep=rows.length>12?2:1;
   series.forEach((arr,si)=>{
     arr.forEach((v,i)=>{
+      if(i%labelStep!==0) return;
       const cx=x(i), cy=y(v), text=money(v);
       const preferred=cols.length>1 ? (si===0?"above":"below") : (i%2===0?"above":"below");
       const pos=expandedVerticalLabelPlacement(cx,cy,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},preferred,used);
@@ -1175,9 +1178,11 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
     });
   });
 
-  // Números horizontais e grandes. Cada etiqueta é posicionada sem sobreposição.
+  // Números horizontais e grandes. Em intervalos longos, mostra os valores de 2 em 2 meses.
   const used=[];
+  const labelStep=rows.length>12?2:1;
   rows.forEach((r,i)=>{
+    if(i%labelStep!==0) return;
     cols.forEach((c,j)=>{
       const v=num(r[c]), h=(H-pt-pb)*v/max;
       const x=pl+i*groupW+(groupW-cols.length*barW)/2+j*barW;
