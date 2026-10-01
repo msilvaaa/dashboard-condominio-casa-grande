@@ -1553,7 +1553,8 @@ function syncEditorStateFromInputs(){
 }
 function renderEditor(){
   const tabs=document.getElementById("editorTabs");
-  tabs.innerHTML=Object.entries(defs).map(([k,v])=>`<button type="button" class="tab ${state.editorTab===k?"active":""}" data-tab="${k}">${v.name}</button>`).join("");
+  const tabOrder=["main","poupanca","utilities","postal","homero","internetGas","inadimplencia"];
+  tabs.innerHTML=tabOrder.filter(k=>defs[k]).map(k=>[k,defs[k]]).map(([k,v])=>`<button type="button" class="tab ${state.editorTab===k?"active":""}" data-tab="${k}">${v.name}</button>`).join("");
   tabs.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{state.editorTab=b.dataset.tab;renderEditor()}));
 
   const d=defs[state.editorTab];
