@@ -1681,7 +1681,9 @@ async function saveNewPassword(){
   btn.disabled=true;
   const oldText=btn.textContent;btn.textContent="Salvando...";error.textContent="";
   try{
-    await neonAuthRequest("reset-password",{method:"POST",body:JSON.stringify({newPassword:password,token})});
+    const resetResponse=await fetch("/api/auth/reset-password",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"include",body:JSON.stringify({newPassword:password,token})});
+    const resetPayload=await resetResponse.json().catch(()=>({}));
+    if(!resetResponse.ok) throw new Error(resetPayload?.message||resetPayload?.error||("HTTP "+resetResponse.status));
     history.replaceState({},document.title,window.location.pathname);
     const email=(()=>{try{return localStorage.getItem("dashboard_login_username")||""}catch(e){return ""}})();
     if(email){
