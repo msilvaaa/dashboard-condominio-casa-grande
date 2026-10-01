@@ -1822,11 +1822,31 @@ document.getElementById("closeEditor").addEventListener("click",()=>document.get
 document.getElementById("saveData").addEventListener("click",async()=>{
   const btn=document.getElementById("saveData");
   const oldText=btn.textContent;
+  const d=defs[state.editorTab];
+  const pendingMonth=document.getElementById("new_0")?.value?.trim()||"";
+  if(pendingMonth){
+    const arr=d.headers.map((_,j)=>document.getElementById("new_"+j)?.value ?? "");
+    if(!/^\\d{4}-\\d{2}$/.test(arr[0])){
+      toast("Use o mês no formato AAAA-MM.");
+      return;
+    }
+    arr.forEach((v,j)=>{if(j>0 && v==="")arr[j]="0"});
+    const rows=state.data[state.editorTab];
+    const existing=rows.findIndex(r=>String(r[0])===arr[0]);
+    if(existing>=0) rows[existing]=arr;
+    else rows.push(arr);
+    rows.sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+    if(arr[0] > state.end){
+      state.end=arr[0];
+      fillPeriodSelectors();
+    }
+  }
   btn.disabled=true; btn.textContent="Salvando...";
   const result=await persist();
   btn.disabled=false; btn.textContent=oldText;
   if(result.ok){
     render();
+    renderEditor();
     toast("Dados salvos na nuvem com sucesso.");
   }else if(result.reason==="not_configured"){
     toast("Neon ainda não foi configurado neste arquivo.");
