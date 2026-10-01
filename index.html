@@ -1077,9 +1077,24 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
     arr.forEach((v,i)=>{
       const cx=x(i), cy=y(v);
       s+='<circle cx="'+cx+'" cy="'+cy+'" r="4" fill="'+colors[si]+'" stroke="#fff" stroke-width="1.5"><title>'+fmtMonth(rows[i][0])+' · '+labels[si]+': '+money(v)+'</title></circle>';
-      // Expanded mode: show the exact value at every point, while the normal dashboard stays unchanged.
-      const dy=(si%2===0)?-15:20;
-      s+='<text x="'+cx+'" y="'+(cy+dy)+'" text-anchor="middle" font-size="10.5" font-weight="800" fill="'+colors[si]+'">'+compactMoney(v)+'</text>';
+
+      // No gráfico ampliado, cada número recebe uma caixa branca para permanecer legível mesmo sobre a linha.
+      const text=compactMoney(v), labelW=Math.max(76,Math.min(94,10*text.length+18)), labelH=24;
+      let above=cols.length===1 ? i%2===0 : si===0;
+      let bx=cx-labelW/2;
+      bx=Math.max(pl+2,Math.min(W-pr-labelW-2,bx));
+      let by=above ? cy-labelH-13 : cy+13;
+
+      // Inverte a posição quando o rótulo chegaria fora do gráfico.
+      if(by<pt+2){ above=false; by=cy+13; }
+      if(by+labelH>H-pb-2){ above=true; by=cy-labelH-13; }
+      by=Math.max(pt+2,Math.min(H-pb-labelH-2,by));
+
+      const lx=Math.max(bx+10,Math.min(bx+labelW-10,cx));
+      const ly=above ? by+labelH : by;
+      s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+lx+'" y2="'+ly+'" stroke="'+colors[si]+'" stroke-width="1.2" opacity=".45"/>';
+      s+='<rect x="'+bx+'" y="'+by+'" width="'+labelW+'" height="'+labelH+'" rx="7" fill="#ffffff" stroke="'+colors[si]+'" stroke-width="1.1"/>';
+      s+='<text x="'+(bx+labelW/2)+'" y="'+(by+16)+'" text-anchor="middle" font-size="10.5" font-weight="850" fill="#172033">'+text+'</text>';
     });
   });
   rows.forEach((r,i)=>{
@@ -1090,7 +1105,6 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:1280px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
   return expandedStats(rows,cols,labels,colors)+svg+buildExpandedTable(rows,cols,labels,colors);
 }
-
 function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
   const W=1460,H=620,pl=102,pr=42,pt=58,pb=98;
   if(!rows.length) return '<div style="padding:50px;text-align:center;color:#667085">Sem dados no período</div>';
@@ -1109,8 +1123,24 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
       const x=pl+i*groupW+(groupW-cols.length*barW)/2+j*barW;
       const y=H-pb-h, bw=Math.max(9,barW-4);
       s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="5" fill="'+colors[j]+'"><title>'+fmtMonth(r[0])+' · '+labels[j]+': '+money(v)+'</title></rect>';
-      const labelY=alignCallouts ? Math.max(pt+14, Math.min(...cols.map(cc=>H-pb-(H-pt-pb)*num(r[cc])/max))-8) : Math.max(pt+12,y-8);
-      s+='<text x="'+(x+bw/2)+'" y="'+labelY+'" text-anchor="middle" font-size="10" font-weight="800" fill="'+colors[j]+'">'+compactMoney(v)+'</text>';
+
+      // No gráfico ampliado, os valores ficam dentro de caixas brancas, evitando que o número seja encoberto pela barra ou por outro valor.
+      const text=compactMoney(v), labelW=Math.max(70,Math.min(92,9.5*text.length+18)), labelH=23;
+      const cx=x+bw/2;
+      let by=y-labelH-8;
+
+      // Para os gráficos com várias séries, cada valor permanece próximo da própria barra.
+      // Se não houver espaço acima, a etiqueta vai para dentro/abaixo da barra.
+      if(by<pt+2) by=y+8;
+      if(by+labelH>H-pb-2) by=H-pb-labelH-2;
+
+      let bx=cx-labelW/2;
+      bx=Math.max(pl+2,Math.min(W-pr-labelW-2,bx));
+
+      const targetY=by>y ? by : by+labelH;
+      s+='<line x1="'+cx+'" y1="'+y+'" x2="'+cx+'" y2="'+targetY+'" stroke="'+colors[j]+'" stroke-width="1.1" opacity=".4"/>';
+      s+='<rect x="'+bx+'" y="'+by+'" width="'+labelW+'" height="'+labelH+'" rx="7" fill="#ffffff" stroke="'+colors[j]+'" stroke-width="1.05"/>';
+      s+='<text x="'+(bx+labelW/2)+'" y="'+(by+15.5)+'" text-anchor="middle" font-size="9.5" font-weight="850" fill="#172033">'+text+'</text>';
     });
     const cx=pl+i*groupW+groupW/2;
     s+='<line x1="'+cx+'" y1="'+(H-pb)+'" x2="'+cx+'" y2="'+(H-pb+5)+'" stroke="#cfd6df"/>';
@@ -1119,7 +1149,6 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
   const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:1280px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
   return expandedStats(rows,cols,labels,colors)+svg+buildExpandedTable(rows,cols,labels,colors);
 }
-
 function openChartModal(chartId,title){
   const modal=document.getElementById("chartModal");
   const host=document.getElementById("chartModalChart");
