@@ -13,7 +13,7 @@
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#eef3f9 0,#f7f9fc 34%,#f4f7fb 100%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}
 button,input,select,textarea{font:inherit}button{cursor:pointer}.wrap{max-width:1450px;margin:0 auto;padding:28px}
 .top{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:24px}.eyebrow{font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:800}
-.dashboard-title-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.convention-btn{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 14px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);font-size:11px;font-weight:800;text-decoration:none;white-space:nowrap}.convention-btn:hover{background:#f8fafc;border-color:#cbd5e1} h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{color:var(--muted);max-width:760px}
+.dashboard-title-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.convention-btn{font-weight:700;text-decoration:none}.convention-btn:hover{filter:brightness(.98)} h1{font-size:32px;line-height:1.1;margin:6px 0 8px;letter-spacing:-.03em}.sub{color:var(--muted);max-width:760px}
 .controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:flex-start}.period-stack{display:flex;flex-direction:column;align-items:flex-end;gap:7px}.period-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px}.edit-data-btn{align-self:auto}.control{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 13px;color:var(--text)}
 .btn{border:0;border-radius:12px;padding:11px 14px;font-weight:700}.btn.primary{background:var(--navy);color:white}.btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--text)}.btn.danger{background:#fff1f2;color:#b42318;border:1px solid #fecdd3}
 .grid{display:grid;gap:16px}.kpis{grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:16px}.card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
@@ -367,7 +367,7 @@ html.dark .editor-user-line strong{color:#93c5fd}
 }
 .theme-toggle:hover{background:var(--panel);border-color:var(--line);color:var(--text);transform:none}
 .theme-icon{font-size:15px;line-height:1}
-#openEditor,.print-btn{height:36px;min-height:36px;padding:0 11px;font-size:11px;border-radius:9px;white-space:nowrap;font-weight:700;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+#openEditor,.print-btn,.convention-btn{height:36px;min-height:36px;padding:0 11px;font-size:11px;border-radius:9px;white-space:nowrap;font-weight:700;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
 
 html.dark{
   --bg:#0b1220;--panel:#111827;--panel2:#182233;--text:#e5e7eb;--muted:#9ca3af;--line:#273449;
@@ -457,7 +457,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
   <div class="top">
     <div>
       <div class="eyebrow">Análise financeira</div>
-      <div class="dashboard-title-row"><h1>Condomínio Casa Grande</h1><a class="convention-btn" href="/convencao-casa-grande.pdf" target="_blank" rel="noopener" title="Abrir a Convenção do Condomínio Casa Grande">Convenção</a></div>
+      <div class="dashboard-title-row"><h1>Condomínio Casa Grande</h1><a class="btn primary convention-btn" href="/convencao-casa-grande.pdf" target="_blank" rel="noopener" title="Abrir a Convenção do Condomínio Casa Grande">Convenção</a></div>
       <div class="sub">Acompanhe de forma clara a evolução financeira do condomínio, incluindo saldo, arrecadação, despesas, garagem, fundo de reserva e demais gastos. Os gráficos destacam os maiores e menores valores, e você pode passar o mouse sobre os pontos ou barras para consultar os valores exatos.</div>
     </div>
     <div class="controls">
