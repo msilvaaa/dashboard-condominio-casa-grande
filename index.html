@@ -1539,7 +1539,8 @@ function renderEditor(){
       return d.types[j]==="number" ? normalizeEditorNumber(value) : String(value).trim();
     });
     if(!/^\d{4}-\d{2}$/.test(arr[0])){toast("Use o mês no formato AAAA-MM.");return}
-    arr.forEach((v,j)=>{if(j>0 && v==="")arr[j]="0"});\n    if(state.editorTab==="main") arr[4]=String(num(arr[2])+num(arr[5]));
+    arr.forEach((v,j)=>{if(j>0 && v==="")arr[j]="0"});
+    if(state.editorTab==="main") arr[4]=String(num(arr[2])+num(arr[5]));
     state.data[state.editorTab].push(arr);
     state.data[state.editorTab].sort((a,b)=>a[0].localeCompare(b[0]));
     // Ao adicionar um mês posterior ao período atual, estende automaticamente o filtro "Até".
