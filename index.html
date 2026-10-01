@@ -1056,14 +1056,13 @@ function buildExpandedTable(rows, cols, labels, colors){
 }
 
 function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[],labelW=null){
-  const labelW2=Math.max(82,Math.min(110,11*text.length+24));
-  const labelH=32;
-  const gap=16;
+  const labelW2=Math.max(88,Math.min(122,10*text.length+28));
+  const labelH=30;
+  const gap=14;
   const candidates=[];
-  const xOffsets=[0,-52,52,-92,92,-132,132];
-  const yDistances=[gap,32,50,68];
+  const xOffsets=[0,-54,54,-108,108,-162,162];
+  const yDistances=[gap,30,46,64,82];
 
-  // Prioriza a direção pedida e depois tenta a direção oposta.
   const dirs=preferred==="above"?["above","below"]:["below","above"];
   dirs.forEach(dir=>{
     yDistances.forEach(dist=>{
@@ -1076,17 +1075,16 @@ function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[
   });
 
   const clampX=(bx)=>Math.max(plot.left,Math.min(plot.right-labelW2,bx));
-  const intersects=(a,b)=>!(a.bx+labelW2+4<=b.bx || b.bx+b.width+4<=a.bx || a.by+labelH+5<=b.by || b.by+b.height+5<=a.by);
+  const intersects=(a,b)=>!(a.bx+a.width+6<=b.bx || b.bx+b.width+6<=a.bx || a.by+a.height+6<=b.by || b.by+b.height+6<=a.by);
 
   for(const candidate of candidates){
     const bx=clampX(candidate.bx);
     const by=candidate.by;
     if(by<plot.top || by+labelH>plot.bottom) continue;
     const box={bx,by,width:labelW2,height:labelH};
-    if(!used.some(u=>intersects(box,u))) return { ...box,dir:candidate.dir };
+    if(!used.some(u=>intersects(box,u))) return {...box,dir:candidate.dir};
   }
 
-  // Fallback: encontra a posição com menor sobreposição, mantendo a etiqueta dentro do gráfico.
   let best=null,bestScore=Infinity;
   for(const candidate of candidates){
     const bx=clampX(candidate.bx);
@@ -1101,7 +1099,6 @@ function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[
   }
   return best;
 }
-
 function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   const W=1460,H=620,pl=108,pr=42,pt=58,pb=92;
   if(!rows.length) return '<div style="padding:50px;text-align:center;color:#667085">Sem dados no período</div>';
@@ -1120,29 +1117,28 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   const zero=y(0);
   if(zero>=pt&&zero<=H-pb) s+='<line x1="'+pl+'" y1="'+zero+'" x2="'+(W-pr)+'" y2="'+zero+'" stroke="#98a2b3" stroke-width="1.5" stroke-dasharray="7 6"/>';
 
-  // Linhas e pontos primeiro.
   series.forEach((arr,si)=>{
     s+='<path d="'+arr.map((v,i)=>(i?'L':'M')+x(i)+' '+y(v)).join(' ')+'" fill="none" stroke="'+colors[si]+'" stroke-width="'+strokeWidth+'" stroke-linecap="round" stroke-linejoin="round"/>';
     arr.forEach((v,i)=>{
       const cx=x(i), cy=y(v);
-      s+='<circle cx="'+cx+'" cy="'+cy+'" r="4" fill="'+colors[si]+'" stroke="#fff" stroke-width="1.5"><title>'+fmtMonth(rows[i][0])+' · '+labels[si]+': '+money(v)+'</title></circle>';
+      s+='<circle cx="'+cx+'" cy="'+cy+'" r="4.5" fill="'+colors[si]+'" stroke="#fff" stroke-width="1.8"><title>'+fmtMonth(rows[i][0])+' · '+labels[si]+': '+money(v)+'</title></circle>';
     });
   });
 
-  // Todas as etiquetas são posicionadas antes de serem desenhadas e não podem se sobrepor.
+  // Números horizontais e grandes. Cada etiqueta é posicionada sem sobreposição.
   const used=[];
   series.forEach((arr,si)=>{
     arr.forEach((v,i)=>{
-      const cx=x(i), cy=y(v);
-      const text=compactMoney(v);
+      const cx=x(i), cy=y(v), text=money(v);
       const preferred=cols.length>1 ? (si===0?"above":"below") : (i%2===0?"above":"below");
       const pos=expandedVerticalLabelPlacement(cx,cy,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},preferred,used);
       used.push(pos);
 
-      const lx=cx, ly=pos.dir==="above"?pos.by+pos.height:pos.by;
-      s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+lx+'" y2="'+ly+'" stroke="'+colors[si]+'" stroke-width="1.2" opacity=".5"/>';
-      s+='<rect x="'+pos.bx+'" y="'+pos.by+'" width="'+pos.width+'" height="'+pos.height+'" rx="8" fill="#ffffff" stroke="'+colors[si]+'" stroke-width="1.2"/>';
-      s+='<text x="'+(pos.bx+pos.width/2)+'" y="'+(pos.by+pos.height/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="900" fill="#172033" transform="rotate(-90 '+(pos.bx+pos.width/2)+' '+(pos.by+pos.height/2)+')">'+text+'</text>';
+      const lx=Math.max(pos.bx+10,Math.min(pos.bx+pos.width-10,cx));
+      const ly=pos.dir==="above"?pos.by+pos.height:pos.by;
+      s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+lx+'" y2="'+ly+'" stroke="'+colors[si]+'" stroke-width="1.25" opacity=".5"/>';
+      s+='<rect x="'+pos.bx+'" y="'+pos.by+'" width="'+pos.width+'" height="'+pos.height+'" rx="8" fill="#ffffff" stroke="'+colors[si]+'" stroke-width="1.25"/>';
+      s+='<text x="'+(pos.bx+pos.width/2)+'" y="'+(pos.by+19)+'" text-anchor="middle" font-size="12" font-weight="900" fill="#172033">'+text+'</text>';
     });
   });
 
@@ -1154,7 +1150,6 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:1280px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
   return expandedStats(rows,cols,labels,colors)+svg+buildExpandedTable(rows,cols,labels,colors);
 }
-
 function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
   const W=1460,H=620,pl=102,pr=42,pt=58,pb=98;
   if(!rows.length) return '<div style="padding:50px;text-align:center;color:#667085">Sem dados no período</div>';
@@ -1168,7 +1163,6 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
     if(g>0) s+='<text x="'+(pl-14)+'" y="'+(yy+5)+'" text-anchor="end" font-size="12" fill="#667085">'+compactMoney(val)+'</text>';
   }
 
-  // As barras são desenhadas primeiro.
   rows.forEach((r,i)=>{
     cols.forEach((c,j)=>{
       const v=num(r[c]), h=(H-pt-pb)*v/max;
@@ -1178,66 +1172,25 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
     });
   });
 
-  // Etiquetas verticais sem sobreposição entre meses ou séries.
+  // Números horizontais e grandes. Cada etiqueta é posicionada sem sobreposição.
   const used=[];
   rows.forEach((r,i)=>{
     cols.forEach((c,j)=>{
       const v=num(r[c]), h=(H-pt-pb)*v/max;
       const x=pl+i*groupW+(groupW-cols.length*barW)/2+j*barW;
       const y=H-pb-h, bw=Math.max(9,barW-4), cx=x+bw/2;
-      const text=compactMoney(v);
+      const text=money(v);
       const pos=expandedVerticalLabelPlacement(cx,y,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},"above",used);
       used.push(pos);
 
       const ly=pos.by+pos.height;
-      s+='<line x1="'+cx+'" y1="'+y+'" x2="'+cx+'" y2="'+ly+'" stroke="'+colors[j]+'" stroke-width="1.1" opacity=".4"/>';
+      s+='<line x1="'+cx+'" y1="'+y+'" x2="'+cx+'" y2="'+ly+'" stroke="'+colors[j]+'" stroke-width="1.15" opacity=".4"/>';
       s+='<rect x="'+pos.bx+'" y="'+pos.by+'" width="'+pos.width+'" height="'+pos.height+'" rx="7" fill="#ffffff" stroke="'+colors[j]+'" stroke-width="1.1"/>';
-      s+='<text x="'+(pos.bx+pos.width/2)+'" y="'+(pos.by+pos.height/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="900" fill="#172033" transform="rotate(-90 '+(pos.bx+pos.width/2)+' '+(pos.by+pos.height/2)+')">'+text+'</text>';
+      s+='<text x="'+(pos.bx+pos.width/2)+'" y="'+(pos.by+19)+'" text-anchor="middle" font-size="11.5" font-weight="900" fill="#172033">'+text+'</text>';
     });
   });
 
   rows.forEach((r,i)=>{
-    const cx=pl+i*groupW+groupW/2;
-    s+='<line x1="'+cx+'" y1="'+(H-pb)+'" x2="'+cx+'" y2="'+(H-pb+5)+'" stroke="#cfd6df"/>';
-    s+='<text x="'+cx+'" y="'+(H-48)+'" text-anchor="middle" font-size="11" fill="#667085">'+fmtMonth(r[0])+'</text>';
-  });
-  const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:1280px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
-  return expandedStats(rows,cols,labels,colors)+svg+buildExpandedTable(rows,cols,labels,colors);
-}
-function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
-  const W=1460,H=620,pl=102,pr=42,pt=58,pb=98;
-  if(!rows.length) return '<div style="padding:50px;text-align:center;color:#667085">Sem dados no período</div>';
-  const vals=cols.map(c=>rows.map(r=>num(r[c])));
-  const max=Math.max(1,...vals.flat()), groupW=(W-pl-pr)/rows.length;
-  const barW=Math.max(14,Math.min(32,(groupW*.70)/cols.length));
-  let s='';
-  for(let g=0;g<=7;g++){
-    const yy=pt+(H-pt-pb)*(1-g/7), val=max*g/7;
-    s+='<line x1="'+pl+'" y1="'+yy+'" x2="'+(W-pr)+'" y2="'+yy+'" stroke="#edf0f4"/>';
-    if(g>0) s+='<text x="'+(pl-14)+'" y="'+(yy+5)+'" text-anchor="end" font-size="12" fill="#667085">'+compactMoney(val)+'</text>';
-  }
-  rows.forEach((r,i)=>{
-    cols.forEach((c,j)=>{
-      const v=num(r[c]), h=(H-pt-pb)*v/max;
-      const x=pl+i*groupW+(groupW-cols.length*barW)/2+j*barW;
-      const y=H-pb-h, bw=Math.max(9,barW-4);
-      s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="5" fill="'+colors[j]+'"><title>'+fmtMonth(r[0])+' · '+labels[j]+': '+money(v)+'</title></rect>';
-
-      // No gráfico ampliado, os valores ficam dentro de caixas brancas, evitando que o número seja encoberto pela barra ou por outro valor.
-      const text=compactMoney(v), labelW=22, labelH=Math.max(68,Math.min(102,9.5*text.length+22));
-      const cx=x+bw/2;
-      let by=y-labelH-8;
-      if(by<pt+2) by=y+8;
-      if(by+labelH>H-pb-2) by=H-pb-labelH-2;
-
-      let bx=cx-labelW/2;
-      bx=Math.max(pl+2,Math.min(W-pr-labelW-2,bx));
-
-      const targetY=by>y ? by : by+labelH;
-      s+='<line x1="'+cx+'" y1="'+y+'" x2="'+cx+'" y2="'+targetY+'" stroke="'+colors[j]+'" stroke-width="1.1" opacity=".4"/>';
-      s+='<rect x="'+bx+'" y="'+by+'" width="'+labelW+'" height="'+labelH+'" rx="7" fill="#ffffff" stroke="'+colors[j]+'" stroke-width="1.05"/>';
-      s+='<text x="'+cx+'" y="'+(by+labelH/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="850" fill="#172033" transform="rotate(-90 '+cx+' '+(by+labelH/2)+')">'+text+'</text>';
-    });
     const cx=pl+i*groupW+groupW/2;
     s+='<line x1="'+cx+'" y1="'+(H-pb)+'" x2="'+cx+'" y2="'+(H-pb+5)+'" stroke="#cfd6df"/>';
     s+='<text x="'+cx+'" y="'+(H-48)+'" text-anchor="middle" font-size="11" fill="#667085">'+fmtMonth(r[0])+'</text>';
