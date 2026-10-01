@@ -1827,7 +1827,6 @@ document.getElementById("saveData").addEventListener("click",async()=>{
   btn.disabled=false; btn.textContent=oldText;
   if(result.ok){
     render();
-    document.getElementById("editorModal").classList.remove("open");
     toast("Dados salvos na nuvem com sucesso.");
   }else if(result.reason==="not_configured"){
     toast("Neon ainda não foi configurado neste arquivo.");
