@@ -1485,6 +1485,21 @@ function render(){
 
 }
 function toast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2200)}
+function recalcMainDerivedFields(){
+  const rows=state.data.main || [];
+  rows.sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+  rows.forEach((row,i)=>{
+    const cond=num(normalizeEditorNumber(row[2]||"0"));
+    const garagem=num(normalizeEditorNumber(row[5]||"0"));
+    row[4]=String(cond+garagem);
+    if(i===0) row[6]="-";
+    else {
+      const atual=num(normalizeEditorNumber(row[1]||"0"));
+      const anterior=num(normalizeEditorNumber(rows[i-1][1]||"0"));
+      row[6]=String(atual-anterior);
+    }
+  });
+}
 function normalizeEditorNumber(value){
   const raw=String(value ?? "").trim();
   if(raw==="") return "";
@@ -1526,10 +1541,10 @@ function renderEditor(){
   tabs.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{state.editorTab=b.dataset.tab;renderEditor()}));
   const d=defs[state.editorTab], rows=state.data[state.editorTab];
   const head=d.headers.map(h=>`<th style="text-align:left">${esc(h)}</th>`).join("");
-  const body=rows.map((r,i)=>`<tr>${r.map((v,j)=>{ const auto=state.editorTab==="main"&&j===4; const value=auto ? formatEditorNumber(num(normalizeEditorNumber(r[2]))+num(normalizeEditorNumber(r[5]))) : (d.types[j]==="number"?formatEditorNumber(v):v); return `<td><input data-r="${i}" data-c="${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" value="${esc(value)}"${auto?" readonly aria-readonly=\"true\"":""}></td>`; }).join("")}<td><button type="button" class="btn danger small-delete" data-del="${i}" style="padding:7px 9px">Excluir</button></td></tr>`).join("");
+  const body=rows.map((r,i)=>`<tr>${r.map((v,j)=>{ const autoArrec=state.editorTab==="main"&&j===4; const autoEvol=state.editorTab==="main"&&j===6; const value=autoArrec ? formatEditorNumber(num(normalizeEditorNumber(r[2]))+num(normalizeEditorNumber(r[5]))) : autoEvol ? (i===0?"—":formatEditorNumber(num(normalizeEditorNumber(r[1]))-num(normalizeEditorNumber(rows[i-1][1])))) : (d.types[j]==="number"?formatEditorNumber(v):v); return `<td><input data-r="${i}" data-c="${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" value="${esc(value)}"${(autoArrec||autoEvol)?" readonly aria-readonly=\"true\"":""}></td>`; }).join("")}<td><button type="button" class="btn danger small-delete" data-del="${i}" style="padding:7px 9px">Excluir</button></td></tr>`).join("");
   document.getElementById("editorBody").innerHTML=`
     <div class="editor-grid">
-      ${d.headers.map((h,j)=>{ const auto=state.editorTab==="main"&&j===4; if(auto) return ""; return `<div><label>${h}</label><input id="new_${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" placeholder="${j===0?"2026-09":""}"></div>`; }).join("")}
+      ${d.headers.map((h,j)=>{ const auto=state.editorTab==="main"&&(j===4||j===6); if(auto) return ""; return `<div><label>${h}</label><input id="new_${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" placeholder="${j===0?"2026-09":""}"></div>`; }).join("")}
       <div style="display:flex;align-items:end"><button type="button" class="btn ghost" id="addRow" style="width:100%">+ Nova linha</button></div>
     </div>
     <div class="table-scroll" style="max-height:360px"><table class="edit-table"><thead><tr>${head}<th></th></tr></thead><tbody>${body}</tbody></table></div>`;
@@ -1540,7 +1555,7 @@ function renderEditor(){
     });
     if(!/^\d{4}-\d{2}$/.test(arr[0])){toast("Use o mês no formato AAAA-MM.");return}
     arr.forEach((v,j)=>{if(j>0 && v==="")arr[j]="0"});
-    if(state.editorTab==="main") arr[4]=String(num(arr[2])+num(arr[5]));
+    if(state.editorTab==="main") { arr[4]=String(num(arr[2])+num(arr[5])); arr[6]="-"; }
     state.data[state.editorTab].push(arr);
     state.data[state.editorTab].sort((a,b)=>a[0].localeCompare(b[0]));
     // Ao adicionar um mês posterior ao período atual, estende automaticamente o filtro "Até".
@@ -1563,13 +1578,12 @@ function renderEditor(){
   updateNewArrecadacao();
   document.querySelectorAll(".edit-table input").forEach(inp=>inp.addEventListener("change",()=>{
     const r=Number(inp.dataset.r), col=Number(inp.dataset.c);
-    if(!state.data[state.editorTab][r] || (state.editorTab==="main" && col===4)) return;
+    if(!state.data[state.editorTab][r] || (state.editorTab==="main" && (col===4 || col===6))) return;
     state.data[state.editorTab][r][col]=d.types[col]==="number" ? normalizeEditorNumber(inp.value) : inp.value;
-    if(state.editorTab==="main" && (col===2 || col===5)){
-      const row=state.data[state.editorTab][r];
-      row[4]=String(num(normalizeEditorNumber(row[2]))+num(normalizeEditorNumber(row[5])));
-      const out=document.querySelector(`.edit-table input[data-r="${r}"][data-c="4"]`);
-      if(out) out.value=formatEditorNumber(row[4]);
+    if(state.editorTab==="main"){
+      recalcMainDerivedFields();
+      renderEditor();
+      render();
     }
   }));
   if(state.editorTab==="main"){
@@ -1901,6 +1915,7 @@ document.getElementById("saveData").addEventListener("click",async()=>{
     }
   }
 
+  if(state.editorTab==="main") recalcMainDerivedFields();
   persistLocal();
   btn.disabled=true; btn.textContent="Salvando...";
   const result=await persist();
