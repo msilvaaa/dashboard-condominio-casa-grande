@@ -1529,7 +1529,7 @@ function renderEditor(){
   const body=rows.map((r,i)=>`<tr>${r.map((v,j)=>{ const auto=state.editorTab==="main"&&j===4; const value=auto ? formatEditorNumber(num(normalizeEditorNumber(r[2]))+num(normalizeEditorNumber(r[5]))) : (d.types[j]==="number"?formatEditorNumber(v):v); return `<td><input data-r="${i}" data-c="${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" value="${esc(value)}"${auto?" readonly aria-readonly=\"true\"":""}></td>`; }).join("")}<td><button type="button" class="btn danger small-delete" data-del="${i}" style="padding:7px 9px">Excluir</button></td></tr>`).join("");
   document.getElementById("editorBody").innerHTML=`
     <div class="editor-grid">
-      ${d.headers.map((h,j)=>{ const auto=state.editorTab==="main"&&j===4; return `<div><label>${h}</label><input id="new_${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" placeholder="${j===0?"2026-09":""}"${auto?" readonly aria-readonly=\"true\"":""}></div>`; }).join("")}
+      ${d.headers.map((h,j)=>{ const auto=state.editorTab==="main"&&j===4; if(auto) return ""; return `<div><label>${h}</label><input id="new_${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" placeholder="${j===0?"2026-09":""}"></div>`; }).join("")}
       <div style="display:flex;align-items:end"><button type="button" class="btn ghost" id="addRow" style="width:100%">+ Nova linha</button></div>
     </div>
     <div class="table-scroll" style="max-height:360px"><table class="edit-table"><thead><tr>${head}<th></th></tr></thead><tbody>${body}</tbody></table></div>`;
