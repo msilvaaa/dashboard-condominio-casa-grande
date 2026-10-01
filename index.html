@@ -1072,28 +1072,43 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   }
   const zero=y(0);
   if(zero>=pt&&zero<=H-pb) s+='<line x1="'+pl+'" y1="'+zero+'" x2="'+(W-pr)+'" y2="'+zero+'" stroke="#98a2b3" stroke-width="1.5" stroke-dasharray="7 6"/>';
+
+  // Primeiro desenha todas as linhas e pontos.
   series.forEach((arr,si)=>{
     s+='<path d="'+arr.map((v,i)=>(i?'L':'M')+x(i)+' '+y(v)).join(' ')+'" fill="none" stroke="'+colors[si]+'" stroke-width="'+strokeWidth+'" stroke-linecap="round" stroke-linejoin="round"/>';
     arr.forEach((v,i)=>{
       const cx=x(i), cy=y(v);
       s+='<circle cx="'+cx+'" cy="'+cy+'" r="4" fill="'+colors[si]+'" stroke="#fff" stroke-width="1.5"><title>'+fmtMonth(rows[i][0])+' · '+labels[si]+': '+money(v)+'</title></circle>';
-
-      // No gráfico ampliado, cada número recebe uma caixa branca para permanecer legível mesmo sobre a linha.
-      const text=compactMoney(v), labelW=24, labelH=Math.max(72,Math.min(106,10*text.length+24));
-      let above=cols.length===1 ? i%2===0 : si===0;
-      let bx=cx-labelW/2;
-      let by=above ? cy-labelH-13 : cy+13;
-
-      if(by<pt+2){ above=false; by=cy+13; }
-      if(by+labelH>H-pb-2){ above=true; by=cy-labelH-13; }
-      by=Math.max(pt+2,Math.min(H-pb-labelH-2,by));
-
-      const lx=cx, ly=above ? by+labelH : by;
-      s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+lx+'" y2="'+ly+'" stroke="'+colors[si]+'" stroke-width="1.2" opacity=".45"/>';
-      s+='<rect x="'+bx+'" y="'+by+'" width="'+labelW+'" height="'+labelH+'" rx="7" fill="#ffffff" stroke="'+colors[si]+'" stroke-width="1.1"/>';
-      s+='<text x="'+cx+'" y="'+(by+labelH/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="850" fill="#172033" transform="rotate(-90 '+cx+' '+(by+labelH/2)+')">'+text+'</text>';
     });
   });
+
+  // Depois desenha todas as etiquetas por cima das linhas para nunca ficarem escondidas.
+  series.forEach((arr,si)=>{
+    arr.forEach((v,i)=>{
+      const cx=x(i), cy=y(v);
+      const text=compactMoney(v), labelW=26, labelH=Math.max(82,Math.min(112,9.5*text.length+28));
+      // Série principal (ex.: linha verde da arrecadação) fica acima e vertical, lendo de baixo para cima.
+      let above = cols.length===1 ? i%2===0 : si===0;
+      let bx=cx-labelW/2;
+      let by=above ? cy-labelH-14 : cy+14;
+
+      // Garante que a caixa permaneça dentro da área do gráfico.
+      if(by<pt+2){ above=false; by=cy+14; }
+      if(by+labelH>H-pb-2){ above=true; by=cy-labelH-14; }
+      by=Math.max(pt+2,Math.min(H-pb-labelH-2,by));
+
+      // Pequeno deslocamento lateral em gráficos com duas séries para separar as etiquetas.
+      const sideNudge=cols.length>1 ? (si===0 ? -6 : 6) : 0;
+      bx+=sideNudge;
+      bx=Math.max(pl+2,Math.min(W-pr-labelW-2,bx));
+
+      const lx=cx, ly=above ? by+labelH : by;
+      s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+lx+'" y2="'+ly+'" stroke="'+colors[si]+'" stroke-width="1.2" opacity=".5"/>';
+      s+='<rect x="'+bx+'" y="'+by+'" width="'+labelW+'" height="'+labelH+'" rx="8" fill="#ffffff" stroke="'+colors[si]+'" stroke-width="1.2"/>';
+      s+='<text x="'+(bx+labelW/2)+'" y="'+(by+labelH/2)+'" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="900" fill="#172033" transform="rotate(-90 '+(bx+labelW/2)+' '+(by+labelH/2)+')">'+text+'</text>';
+    });
+  });
+
   rows.forEach((r,i)=>{
     const cx=x(i);
     s+='<line x1="'+cx+'" y1="'+(H-pb)+'" x2="'+cx+'" y2="'+(H-pb+5)+'" stroke="#cfd6df"/>';
