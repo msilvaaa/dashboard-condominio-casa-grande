@@ -1495,6 +1495,14 @@ const defs={
   inadimplencia:{name:"Inadimplência Casa Grande",headers:["Mês","Inadimplência Casa Grande"],types:["text","number"]},
 
 };
+function syncEditorStateFromInputs(){
+  const d=defs[state.editorTab];
+  const rows=state.data[state.editorTab] || [];
+  document.querySelectorAll("#editorBody .edit-table input[data-r][data-c]").forEach(inp=>{
+    const r=Number(inp.dataset.r), col=Number(inp.dataset.c);
+    if(Number.isInteger(r) && Number.isInteger(col) && rows[r]) rows[r][col]=inp.value;
+  });
+}
 function renderEditor(){
   const tabs=document.getElementById("editorTabs");
   tabs.innerHTML=Object.entries(defs).map(([k,v])=>`<button type="button" class="tab ${state.editorTab===k?"active":""}" data-tab="${k}">${v.name}</button>`).join("");
@@ -1823,6 +1831,12 @@ document.getElementById("saveData").addEventListener("click",async()=>{
   const btn=document.getElementById("saveData");
   const oldText=btn.textContent;
   const d=defs[state.editorTab];
+  const rows=state.data[state.editorTab] || [];
+
+  // Primeiro consolida tudo que estiver digitado na tabela.
+  syncEditorStateFromInputs();
+
+  // Também incorpora a linha nova preenchida no topo.
   const pendingMonth=document.getElementById("new_0")?.value?.trim()||"";
   if(pendingMonth){
     const arr=d.headers.map((_,j)=>document.getElementById("new_"+j)?.value ?? "");
@@ -1830,8 +1844,7 @@ document.getElementById("saveData").addEventListener("click",async()=>{
       toast("Use o mês no formato AAAA-MM.");
       return;
     }
-    arr.forEach((v,j)=>{if(j>0 && v==="")arr[j]="0"});
-    const rows=state.data[state.editorTab];
+    arr.forEach((v,j)=>{if(j>0 && String(v).trim()==="")arr[j]="0"});
     const existing=rows.findIndex(r=>String(r[0])===arr[0]);
     if(existing>=0) rows[existing]=arr;
     else rows.push(arr);
@@ -1841,9 +1854,12 @@ document.getElementById("saveData").addEventListener("click",async()=>{
       fillPeriodSelectors();
     }
   }
+
+  persistLocal();
   btn.disabled=true; btn.textContent="Salvando...";
   const result=await persist();
   btn.disabled=false; btn.textContent=oldText;
+
   if(result.ok){
     render();
     renderEditor();
