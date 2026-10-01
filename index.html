@@ -1388,10 +1388,26 @@ function setChartPeriodLabel(chartId,start,end){
   svg.querySelector(".chart-period-label")?.remove();
 }
 
+function expectedRevenueForMonth(month){
+  const [y,m]=String(month).split("-").map(Number);
+  return (y<2026 || (y===2026 && m<=6)) ? 99000 : 98250;
+}
+function getCalculatedInadimplenciaRows(){
+  return (state.data.main || [])
+    .filter(r=>r && /^\d{4}-\d{2}$/.test(String(r[0])))
+    .slice()
+    .sort((a,b)=>String(a[0]).localeCompare(String(b[0])))
+    .map(r=>{
+      const month=String(r[0]);
+      const previsto=expectedRevenueForMonth(month);
+      const executada=num(normalizeEditorNumber(r[4]||"0"));
+      return [month,String(previsto),String(executada),String(previsto-executada)];
+    });
+}
 function renderInadimplencia(rows){
   const calcRows=(rows||[]).map(r=>{
-    const month=String(r[0]), [y,m]=month.split("-").map(Number);
-    const previsto=(y<2026 || (y===2026 && m<=6))?99000:98250;
+    const month=String(r[0]);
+    const previsto=expectedRevenueForMonth(month);
     const executada=num(r[4]);
     const inadimplencia=previsto-executada;
     return [month,previsto,executada,inadimplencia];
@@ -1539,35 +1555,41 @@ function renderEditor(){
   const tabs=document.getElementById("editorTabs");
   tabs.innerHTML=Object.entries(defs).map(([k,v])=>`<button type="button" class="tab ${state.editorTab===k?"active":""}" data-tab="${k}">${v.name}</button>`).join("");
   tabs.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{state.editorTab=b.dataset.tab;renderEditor()}));
-  const d=defs[state.editorTab], rows=state.data[state.editorTab];
+
+  const d=defs[state.editorTab];
+  const rows=state.editorTab==="inadimplencia" ? getCalculatedInadimplenciaRows() : (state.data[state.editorTab] || []);
+  const tableRows=state.editorTab==="inadimplencia"
+    ? rows.map(r=>[r[0],r[3]])
+    : rows;
+
   const head=d.headers.map(h=>`<th style="text-align:left">${esc(h)}</th>`).join("");
-  const body=rows.map((r,i)=>`<tr>${r.map((v,j)=>{ const autoArrec=state.editorTab==="main"&&j===4; const autoEvol=state.editorTab==="main"&&j===6; const value=autoArrec ? formatEditorNumber(num(normalizeEditorNumber(r[2]))+num(normalizeEditorNumber(r[5]))) : autoEvol ? (i===0?"—":formatEditorNumber(num(normalizeEditorNumber(r[1]))-num(normalizeEditorNumber(rows[i-1][1])))) : (d.types[j]==="number"?formatEditorNumber(v):v); return `<td><input data-r="${i}" data-c="${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" value="${esc(value)}"${(autoArrec||autoEvol)?" readonly aria-readonly=\"true\"":""}></td>`; }).join("")}<td><button type="button" class="btn danger small-delete" data-del="${i}" style="padding:7px 9px">Excluir</button></td></tr>`).join("");
+  const body=tableRows.map((r,i)=>`<tr>${r.map((v,j)=>{
+    const autoArrec=state.editorTab==="main"&&j===4;
+    const autoEvol=state.editorTab==="main"&&j===6;
+    const autoInad=state.editorTab==="inadimplencia"&&j===1;
+    let value=v;
+    if(autoArrec) value=formatEditorNumber(num(normalizeEditorNumber(r[2]))+num(normalizeEditorNumber(r[5])));
+    else if(autoEvol) value=i===0?"—":formatEditorNumber(num(normalizeEditorNumber(rows[i][1]))-num(normalizeEditorNumber(rows[i-1][1])));
+    else if(autoInad) value=formatEditorNumber(v);
+    else if(d.types[j]==="number") value=formatEditorNumber(v);
+    return `<td><input data-r="${i}" data-c="${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" value="${esc(value)}"${(autoArrec||autoEvol||autoInad)?" readonly aria-readonly=\"true\"":""}></td>`;
+  }).join("")}${state.editorTab==="inadimplencia"?"":"<td><button type=\"button\" class=\"btn danger small-delete\" data-del=\""+i+"\" style=\"padding:7px 9px\">Excluir</button></td>"}</tr>`).join("");
+
   document.getElementById("editorBody").innerHTML=`
     <div class="editor-grid">
-      ${d.headers.map((h,j)=>{ const auto=state.editorTab==="main"&&(j===4||j===6); if(auto) return ""; return `<div><label>${h}</label><input id="new_${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" placeholder="${j===0?"2026-09":""}"></div>`; }).join("")}
-      <div style="display:flex;align-items:end"><button type="button" class="btn ghost" id="addRow" style="width:100%">+ Nova linha</button></div>
+      ${state.editorTab==="inadimplencia"
+        ? `<div><label>Mês</label><input id="new_0" type="text" inputmode="text" placeholder="2026-09"></div>
+           <div><label>Inadimplência Casa Grande</label><input id="new_1" type="text" readonly aria-readonly="true"></div>`
+        : d.headers.map((h,j)=>{
+            const auto=state.editorTab==="main"&&(j===4||j===6);
+            if(auto) return "";
+            return `<div><label>${h}</label><input id="new_${j}" type="${editorInputType(d.types[j])}" inputmode="${d.types[j]==="number"?"decimal":"text"}" placeholder="${j===0?"2026-09":""}"></div>`;
+          }).join("")}
+      ${state.editorTab==="inadimplencia" ? "" : '<div style="display:flex;align-items:end"><button type="button" class="btn ghost" id="addRow" style="width:100%">+ Nova linha</button></div>'}
     </div>
+    ${state.editorTab==="inadimplencia" ? '<div style="font-size:11px;color:#667085;margin:6px 0 10px">Calculada automaticamente: Arrecadação prevista − Arrecadação executada.</div>' : ""}
     <div class="table-scroll" style="max-height:360px"><table class="edit-table"><thead><tr>${head}<th></th></tr></thead><tbody>${body}</tbody></table></div>`;
-  document.getElementById("addRow").addEventListener("click",()=>{
-    const arr=d.headers.map((_,j)=>{
-      const value=document.getElementById("new_"+j)?.value ?? "";
-      return d.types[j]==="number" ? normalizeEditorNumber(value) : String(value).trim();
-    });
-    if(!/^\d{4}-\d{2}$/.test(arr[0])){toast("Use o mês no formato AAAA-MM.");return}
-    arr.forEach((v,j)=>{if(j>0 && v==="")arr[j]="0"});
-    if(state.editorTab==="main") { arr[4]=String(num(arr[2])+num(arr[5])); arr[6]="-"; }
-    state.data[state.editorTab].push(arr);
-    state.data[state.editorTab].sort((a,b)=>a[0].localeCompare(b[0]));
-    // Ao adicionar um mês posterior ao período atual, estende automaticamente o filtro "Até".
-    if(arr[0] > state.end){
-      state.end = arr[0];
-      fillPeriodSelectors();
-    }
-    renderEditor();
-    render();
-    toast("Linha adicionada.");
-  });
-  document.querySelectorAll(".small-delete").forEach(btn=>btn.addEventListener("click",()=>{state.data[state.editorTab].splice(Number(btn.dataset.del),1);renderEditor()}));
+
   const updateNewArrecadacao=()=>{
     if(state.editorTab!=="main") return;
     const cond=num(normalizeEditorNumber(document.getElementById("new_2")?.value||"0"));
@@ -1575,23 +1597,66 @@ function renderEditor(){
     const field=document.getElementById("new_4");
     if(field) field.value=formatEditorNumber(cond+garagem);
   };
-  updateNewArrecadacao();
-  document.querySelectorAll(".edit-table input").forEach(inp=>inp.addEventListener("change",()=>{
-    const r=Number(inp.dataset.r), col=Number(inp.dataset.c);
-    if(!state.data[state.editorTab][r] || (state.editorTab==="main" && (col===4 || col===6))) return;
-    state.data[state.editorTab][r][col]=d.types[col]==="number" ? normalizeEditorNumber(inp.value) : inp.value;
-    if(state.editorTab==="main"){
-      recalcMainDerivedFields();
-      renderEditor();
-      render();
-    }
-  }));
+  const updateNewInadimplencia=()=>{
+    if(state.editorTab!=="inadimplencia") return;
+    const month=document.getElementById("new_0")?.value?.trim()||"";
+    const field=document.getElementById("new_1");
+    const main=(state.data.main||[]).find(r=>String(r[0])===month);
+    if(field) field.value=main ? formatEditorNumber(expectedRevenueForMonth(month)-num(normalizeEditorNumber(main[4]||"0"))) : "";
+  };
+
   if(state.editorTab==="main"){
+    updateNewArrecadacao();
     document.getElementById("new_2")?.addEventListener("input",updateNewArrecadacao);
     document.getElementById("new_5")?.addEventListener("input",updateNewArrecadacao);
   }
-}
+  if(state.editorTab==="inadimplencia"){
+    document.getElementById("new_0")?.addEventListener("input",updateNewInadimplencia);
+    updateNewInadimplencia();
+  }
 
+  document.getElementById("addRow")?.addEventListener("click",()=>{
+    const arr=d.headers.map((_,j)=>{
+      const value=document.getElementById("new_"+j)?.value ?? "";
+      return d.types[j]==="number" ? normalizeEditorNumber(value) : String(value).trim();
+    });
+    if(!/^\d{4}-\d{2}$/.test(arr[0])){toast("Use o mês no formato AAAA-MM.");return}
+    arr.forEach((v,j)=>{if(j>0 && v==="")arr[j]="0"});
+    if(state.editorTab==="main") {
+      arr[4]=String(num(arr[2])+num(arr[5]));
+      arr[6]="-";
+    }
+    state.data[state.editorTab].push(arr);
+    state.data[state.editorTab].sort((a,b)=>a[0].localeCompare(b[0]));
+    if(arr[0] > state.end){
+      state.end=arr[0];
+      fillPeriodSelectors();
+    }
+    renderEditor();
+    render();
+    toast("Linha adicionada.");
+  });
+
+  document.querySelectorAll(".small-delete").forEach(btn=>btn.addEventListener("click",()=>{
+    if(state.editorTab==="inadimplencia") return;
+    state.data[state.editorTab].splice(Number(btn.dataset.del),1);
+    renderEditor();
+  }));
+
+  if(state.editorTab!=="inadimplencia"){
+    document.querySelectorAll(".edit-table input").forEach(inp=>inp.addEventListener("change",()=>{
+      const r=Number(inp.dataset.r), col=Number(inp.dataset.c);
+      if(!state.data[state.editorTab][r] || (state.editorTab==="main" && (col===4 || col===6))) return;
+      const dtypes=defs[state.editorTab].types;
+      state.data[state.editorTab][r][col]=dtypes[col]==="number" ? normalizeEditorNumber(inp.value) : inp.value;
+      if(state.editorTab==="main"){
+        recalcMainDerivedFields();
+        renderEditor();
+        render();
+      }
+    }));
+  }
+}
 document.getElementById("printExpandedChart")?.addEventListener("click",printExpandedChart);
 document.getElementById("closeChartModal")?.addEventListener("click",()=>closeChartModal());
 document.getElementById("chartModal")?.addEventListener("click",e=>{ if(e.target===e.currentTarget) closeChartModal(); });
