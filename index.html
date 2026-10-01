@@ -650,6 +650,18 @@ async function neonAuthRequest(path, options={}){
   }
   return payload;
 }
+async function neonSignIn(email,password){
+  const response=await fetch("/api/auth/sign-in-email",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"include",body:JSON.stringify({email,password,rememberMe:true})});
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok){const error=new Error(payload?.message||payload?.error||("HTTP "+response.status));error.status=response.status;throw error}
+  return payload;
+}
+async function neonGetSession(){
+  const response=await fetch("/api/auth/get-session",{method:"GET",credentials:"include"});
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok){const error=new Error(payload?.message||payload?.error||("HTTP "+response.status));error.status=response.status;throw error}
+  return payload;
+}
 const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "main"};
 (function syncInitialPeriod(){
   const months=allDataMonths();
@@ -1688,8 +1700,8 @@ async function saveNewPassword(){
     const email=(()=>{try{return localStorage.getItem("dashboard_login_username")||""}catch(e){return ""}})();
     if(email){
       try{
-        await neonAuthRequest("sign-in/email",{method:"POST",body:JSON.stringify({email,password:password,rememberMe:true})});
-        const session=await neonAuthRequest("get-session",{method:"GET"});
+        await neonSignIn(email,password);
+        const session=await neonGetSession();
         const user=session?.user||session?.session?.user;
         if(!user) throw new Error("Sessão não criada após redefinir a senha");
         try{sessionStorage.setItem("dashboard_edit_auth","1")}catch(e){}
@@ -1718,7 +1730,7 @@ async function logoutEditor(){
 }
 async function refreshEditorSession(){
   try{
-    const data=await neonAuthRequest("get-session",{method:"GET"});
+    const data=await neonGetSession();
     const user=data?.user||data?.session?.user;
     const ok=!!(data?.session&&user);
     try{sessionStorage.setItem("dashboard_edit_auth",ok?"1":"0")}catch(e){}
@@ -1749,8 +1761,8 @@ async function attemptLogin(){
   if(!user||!pass){err.textContent="Informe o e-mail e a senha.";return}
   err.textContent="Entrando...";
   try{
-    await neonAuthRequest("sign-in/email",{method:"POST",body:JSON.stringify({email:user,password:pass,rememberMe:true})});
-    const session=await neonAuthRequest("get-session",{method:"GET"});
+    await neonSignIn(user,pass);
+    const session=await neonGetSession();
     const sessionUser=session?.user||session?.session?.user;
     if(!sessionUser) throw new Error("Sessão não criada");
     try{sessionStorage.setItem("dashboard_edit_auth","1")}catch(e){}
