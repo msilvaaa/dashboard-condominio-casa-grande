@@ -1840,7 +1840,7 @@ document.getElementById("saveData").addEventListener("click",async()=>{
   const pendingMonth=document.getElementById("new_0")?.value?.trim()||"";
   if(pendingMonth){
     const arr=d.headers.map((_,j)=>document.getElementById("new_"+j)?.value ?? "");
-    if(!/^\\d{4}-\\d{2}$/.test(arr[0])){
+    if(!/^\d{4}-\d{2}$/.test(arr[0])){
       toast("Use o mês no formato AAAA-MM.");
       return;
     }
