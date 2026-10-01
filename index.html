@@ -1100,7 +1100,9 @@ function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[
   return best;
 }
 function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
-  const W=1460,H=620,pl=108,pr=42,pt=58,pb=92;
+  // Quanto maior o intervalo, maior a largura do gráfico. Assim os meses ficam afastados
+  // e as etiquetas não precisam disputar o mesmo espaço.
+  const W=Math.max(1460,rows.length*110),H=620,pl=108,pr=42,pt=58,pb=92;
   if(!rows.length) return '<div style="padding:50px;text-align:center;color:#667085">Sem dados no período</div>';
   const series=cols.map(c=>rows.map(r=>num(r[c])));
   const all=series.flat();
@@ -1147,11 +1149,12 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
     s+='<line x1="'+cx+'" y1="'+(H-pb)+'" x2="'+cx+'" y2="'+(H-pb+5)+'" stroke="#cfd6df"/>';
     s+='<text x="'+cx+'" y="'+(H-48)+'" text-anchor="middle" font-size="11" fill="#667085">'+fmtMonth(r[0])+'</text>';
   });
-  const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:1280px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
+  const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:'+Math.max(1280,rows.length*110)+'px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
   return expandedStats(rows,cols,labels,colors)+svg+buildExpandedTable(rows,cols,labels,colors);
 }
 function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
-  const W=1460,H=620,pl=102,pr=42,pt=58,pb=98;
+  // Intervalos longos ganham espaço horizontal proporcionalmente ao número de meses.
+  const W=Math.max(1460,rows.length*110),H=620,pl=102,pr=42,pt=58,pb=98;
   if(!rows.length) return '<div style="padding:50px;text-align:center;color:#667085">Sem dados no período</div>';
   const vals=cols.map(c=>rows.map(r=>num(r[c])));
   const max=Math.max(1,...vals.flat()), groupW=(W-pl-pr)/rows.length;
@@ -1195,7 +1198,7 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
     s+='<line x1="'+cx+'" y1="'+(H-pb)+'" x2="'+cx+'" y2="'+(H-pb+5)+'" stroke="#cfd6df"/>';
     s+='<text x="'+cx+'" y="'+(H-48)+'" text-anchor="middle" font-size="11" fill="#667085">'+fmtMonth(r[0])+'</text>';
   });
-  const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:1280px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
+  const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:'+Math.max(1280,rows.length*110)+'px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
   return expandedStats(rows,cols,labels,colors)+svg+buildExpandedTable(rows,cols,labels,colors);
 }
 function openChartModal(chartId,title){
