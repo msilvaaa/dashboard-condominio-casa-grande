@@ -1055,11 +1055,12 @@ function buildExpandedTable(rows, cols, labels, colors){
   return out;
 }
 
-function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[],labelW=38){
-  const labelH=Math.max(98,Math.min(132,11*text.length+34));
+function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[],labelW=null){
+  const labelW2=Math.max(82,Math.min(110,11*text.length+24));
+  const labelH=32;
   const gap=16;
   const candidates=[];
-  const xOffsets=[0,-34,34,-62,62,-90,90];
+  const xOffsets=[0,-52,52,-92,92,-132,132];
   const yDistances=[gap,32,50,68];
 
   // Prioriza a direção pedida e depois tenta a direção oposta.
@@ -1067,21 +1068,21 @@ function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[
   dirs.forEach(dir=>{
     yDistances.forEach(dist=>{
       xOffsets.forEach(dx=>{
-        const bx=cx-labelW/2+dx;
+        const bx=cx-labelW2/2+dx;
         const by=dir==="above"?cy-labelH-dist:cy+dist;
         candidates.push({bx,by,dir});
       });
     });
   });
 
-  const clampX=(bx)=>Math.max(plot.left,Math.min(plot.right-labelW,bx));
-  const intersects=(a,b)=>!(a.bx+labelW+4<=b.bx || b.bx+b.width+4<=a.bx || a.by+labelH+5<=b.by || b.by+b.height+5<=a.by);
+  const clampX=(bx)=>Math.max(plot.left,Math.min(plot.right-labelW2,bx));
+  const intersects=(a,b)=>!(a.bx+labelW2+4<=b.bx || b.bx+b.width+4<=a.bx || a.by+labelH+5<=b.by || b.by+b.height+5<=a.by);
 
   for(const candidate of candidates){
     const bx=clampX(candidate.bx);
     const by=candidate.by;
     if(by<plot.top || by+labelH>plot.bottom) continue;
-    const box={bx,by,width:labelW,height:labelH};
+    const box={bx,by,width:labelW2,height:labelH};
     if(!used.some(u=>intersects(box,u))) return { ...box,dir:candidate.dir };
   }
 
@@ -1090,9 +1091,9 @@ function expandedVerticalLabelPlacement(cx,cy,text,plot,preferred="above",used=[
   for(const candidate of candidates){
     const bx=clampX(candidate.bx);
     const by=Math.max(plot.top,Math.min(plot.bottom-labelH,candidate.by));
-    const box={bx,by,width:labelW,height:labelH};
+    const box={bx,by,width:labelW2,height:labelH};
     const score=used.reduce((sum,u)=>{
-      const ox=Math.max(0,Math.min(box.bx+labelW,u.bx+u.width)-Math.max(box.bx,u.bx));
+      const ox=Math.max(0,Math.min(box.bx+labelW2,u.bx+u.width)-Math.max(box.bx,u.bx));
       const oy=Math.max(0,Math.min(box.by+labelH,u.by+u.height)-Math.max(box.by,u.by));
       return sum+ox*oy;
     },0);
@@ -1135,7 +1136,7 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
       const cx=x(i), cy=y(v);
       const text=compactMoney(v);
       const preferred=cols.length>1 ? (si===0?"above":"below") : (i%2===0?"above":"below");
-      const pos=expandedVerticalLabelPlacement(cx,cy,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},preferred,used,38);
+      const pos=expandedVerticalLabelPlacement(cx,cy,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},preferred,used);
       used.push(pos);
 
       const lx=cx, ly=pos.dir==="above"?pos.by+pos.height:pos.by;
@@ -1185,7 +1186,7 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
       const x=pl+i*groupW+(groupW-cols.length*barW)/2+j*barW;
       const y=H-pb-h, bw=Math.max(9,barW-4), cx=x+bw/2;
       const text=compactMoney(v);
-      const pos=expandedVerticalLabelPlacement(cx,y,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},"above",used,34);
+      const pos=expandedVerticalLabelPlacement(cx,y,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},"above",used);
       used.push(pos);
 
       const ly=pos.by+pos.height;
