@@ -1107,18 +1107,12 @@ function expandedStats(rows, cols, labels, colors){
   const cards=[];
   cols.forEach((c,j)=>{
     const vals=rows.map(r=>num(r[c]));
-    const isSaldo=String(labels[j]).toLowerCase()==="saldo";
     const total=vals.reduce((a,b)=>a+b,0);
     const avg=total/vals.length;
     const min=Math.min(...vals), max=Math.max(...vals);
     const minM=rows[vals.indexOf(min)][0], maxM=rows[vals.indexOf(max)][0];
     cards.push(`<div class="expanded-stat"><div class="expanded-stat-label"><span class="series-dot" style="background:${colors[j]};display:inline-block;margin-right:5px"></span>${esc(labels[j])}</div><div class="expanded-stat-value">${money(avg)}</div><div class="expanded-stat-note">média mensal · mín. ${money(min)} (${fmtMonth(minM)}) · máx. ${money(max)} (${fmtMonth(maxM)})</div></div>`);
-    if(isSaldo){
-      const finalValue=vals.at(-1);
-      cards.push(`<div class="expanded-stat"><div class="expanded-stat-label">${esc(labels[j])} · final do período</div><div class="expanded-stat-value">${money(finalValue)}</div><div class="expanded-stat-note">saldo acumulado respeitando o intervalo selecionado</div></div>`);
-    }else{
-      cards.push(`<div class="expanded-stat"><div class="expanded-stat-label">${esc(labels[j])} · acumulado</div><div class="expanded-stat-value">${money(total)}</div><div class="expanded-stat-note">${vals.length} registros no período</div></div>`);
-    }
+    cards.push(`<div class="expanded-stat"><div class="expanded-stat-label">${esc(labels[j])} · acumulado</div><div class="expanded-stat-value">${money(total)}</div><div class="expanded-stat-note">${vals.length} registros no período</div></div>`);
   });
   return `<div class="expanded-stats">${cards.join('')}</div>`;
 }
@@ -1314,15 +1308,10 @@ function openChartModal(chartId,title){
   }else if(chartId==="internetGasChart"){ rows=filtered(state.data.internetGas); cols=[1,2]; labels=["INTERNET","GÁS NATURAL"]; colors=["#2563eb","#d97706"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="postalChart"){ rows=filtered(state.data.postal); cols=[1]; labels=["Despesas postais"]; colors=["#dc2626"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="homeroChart"){
-    const baseRows=filtered(state.data.homero);
-    let saldo=0;
-    rows=baseRows.map(r=>{
-      saldo += num(r[1]) - num(r[2]);
-      return [r[0],num(r[1]),num(r[2]),saldo];
-    });
-    cols=[1,2,3];
-    labels=["Adiantamentos","Prestação de contas","Saldo"];
-    colors=["#7c3aed","#16a34a","#dc2626"];
+    rows=filtered(state.data.homero);
+    cols=[1,2];
+    labels=["Adiantamentos","Prestação de contas"];
+    colors=["#7c3aed","#16a34a"];
     chartHtml=expandedBarChart(rows,cols,labels,colors);
   }else if(chartId==="rendimentosChart"){
     const pou=filtered(state.data.poupanca), allP=state.data.poupanca || [];
@@ -1348,7 +1337,12 @@ function openChartModal(chartId,title){
     chartHtml=expandedBarChart(rows,cols,labels,colors,true);
   }
   document.getElementById("chartModalTitle").textContent=title;
-  document.getElementById("chartModalSub").textContent="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
+  let modalSub="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
+  if(chartId==="homeroChart"){
+    const saldo=rows.reduce((sum,r)=>sum+num(r[1])-num(r[2]),0);
+    modalSub += " · Saldo: "+money(saldo);
+  }
+  document.getElementById("chartModalSub").textContent=modalSub;
   host.innerHTML=chartHtml;
   modal.classList.add("open"); modal.setAttribute("aria-hidden","false");
   document.body.style.overflow="hidden";
