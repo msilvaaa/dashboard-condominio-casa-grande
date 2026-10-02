@@ -1529,6 +1529,7 @@ function renderHomeroSummary(rows){
   const totalAdiantamentos=rows.reduce((sum,r)=>sum+num(r[1]),0);
   const totalPrestacao=rows.reduce((sum,r)=>sum+num(r[2]),0);
   const saldo=totalAdiantamentos-totalPrestacao;
+  const saldoLabel=saldo>0?"Saldo devedor":saldo<0?"Saldo credor":"Saldo";
   const saldoClass=saldo>0?"saldo-red":saldo<0?"saldo-green":"difference-card";
   const saldoDot=saldo>0?"#dc2626":saldo<0?"#16a34a":"#d97706";
   const box=document.getElementById("homeroSummary");
@@ -1546,8 +1547,8 @@ function renderHomeroSummary(rows){
         <div class="chart-summary-total"><span>Total</span><b>${money(totalPrestacao)}</b></div>
       </div>
       <div class="chart-summary-card ${saldoClass}">
-        <div class="chart-summary-series"><span class="chart-summary-dot" style="background:${saldoDot}"></span><span>Saldo</span></div>
-        <div class="chart-summary-total"><span>Saldo</span><b>${money(saldo)}</b></div>
+        <div class="chart-summary-series"><span class="chart-summary-dot" style="background:${saldoDot}"></span><span>${saldoLabel}</span></div>
+        <div class="chart-summary-total"><span>${saldoLabel}</span><b>${money(saldo)}</b></div>
       </div>
     </div>`;
 }
