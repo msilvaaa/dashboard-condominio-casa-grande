@@ -1341,7 +1341,7 @@ function openChartModal(chartId,title){
   let modalSub="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
   if(chartId==="homeroChart"){
     const saldo=rows.reduce((sum,r)=>sum+num(r[1])-num(r[2]),0);
-    const saldoLabel=saldo>0?"Saldo devedor":saldo<0?"Saldo credor":"Saldo";
+    const saldoLabel=saldo>0?"Saldo Devedor":saldo<0?"Saldo Credor":"Saldo";
     modalSub += '<br><span class="homero-modal-saldo">'+saldoLabel+': <b>'+money(saldo)+'</b></span>';
   }
   document.getElementById("chartModalSub").innerHTML=modalSub;
