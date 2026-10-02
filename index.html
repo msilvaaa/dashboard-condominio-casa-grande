@@ -213,6 +213,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.wrap{max-width:
 .chart-modal-actions .btn{height:36px;min-height:36px;min-width:74px;padding:0 13px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;font-size:11px;border-radius:9px;white-space:nowrap}
 .chart-modal-print{width:74px}
 .chart-modal-title{font-size:19px;font-weight:850;color:#172033}
+.homero-modal-saldo{display:block;margin-top:4px;color:#2563eb;font-weight:800}.homero-modal-saldo b{font-weight:900}
 .chart-modal-sub{font-size:11px;color:#667085;margin-top:3px}
 .chart-modal-chart{background:#fbfcfe;border:1px solid #e7ecf2;border-radius:16px;padding:12px;overflow:auto}
 /* Eixo vertical fixo durante a rolagem horizontal dos gráficos ampliados */
@@ -1340,16 +1341,11 @@ function openChartModal(chartId,title){
   let modalSub="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
   if(chartId==="homeroChart"){
     const saldo=rows.reduce((sum,r)=>sum+num(r[1])-num(r[2]),0);
-    modalSub += " · Saldo: "+money(saldo);
+    modalSub += '<br><span class="homero-modal-saldo">Saldo: <b>'+money(saldo)+'</b></span>';
   }
-  document.getElementById("chartModalSub").textContent=modalSub;
-  if(chartId==="homeroChart"){
-    document.getElementById("chartModalSub").style.fontWeight="800";
-    document.getElementById("chartModalSub").style.color="#2563eb";
-  } else {
-    document.getElementById("chartModalSub").style.fontWeight="400";
-    document.getElementById("chartModalSub").style.color="";
-  }
+  document.getElementById("chartModalSub").innerHTML=modalSub;
+  document.getElementById("chartModalSub").style.fontWeight="400";
+  document.getElementById("chartModalSub").style.color="";
   host.innerHTML=chartHtml;
   modal.classList.add("open"); modal.setAttribute("aria-hidden","false");
   document.body.style.overflow="hidden";
