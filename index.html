@@ -1343,6 +1343,13 @@ function openChartModal(chartId,title){
     modalSub += " · Saldo: "+money(saldo);
   }
   document.getElementById("chartModalSub").textContent=modalSub;
+  if(chartId==="homeroChart"){
+    document.getElementById("chartModalSub").style.fontWeight="800";
+    document.getElementById("chartModalSub").style.color="#2563eb";
+  } else {
+    document.getElementById("chartModalSub").style.fontWeight="400";
+    document.getElementById("chartModalSub").style.color="";
+  }
   host.innerHTML=chartHtml;
   modal.classList.add("open"); modal.setAttribute("aria-hidden","false");
   document.body.style.overflow="hidden";
