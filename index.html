@@ -434,6 +434,56 @@ html.dark svg [fill="#172033"]{fill:#e5e7eb !important}
 html.dark svg [fill="#ffffff"]{fill:#111827 !important}
 
 
+/* Ajuste final dos botões para visualização em celular */
+@media (max-width:700px){
+  .dashboard-title-row{
+    width:100%;
+    gap:10px;
+  }
+  .dashboard-title-row .convention-btn{
+    flex:0 0 auto;
+    height:42px;
+    min-height:42px;
+    padding:0 16px;
+    font-size:13px;
+    border-radius:12px;
+  }
+  .period-actions{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px;
+    gap:8px;
+  }
+  .period-actions .btn{
+    height:42px;
+    min-height:42px;
+    padding:0 8px;
+    font-size:12px;
+    border-radius:12px;
+    white-space:nowrap;
+  }
+  .period-actions .theme-toggle{
+    height:42px;
+    min-height:42px;
+    width:40px;
+    border-radius:12px;
+  }
+  .period-quick{
+    gap:7px;
+  }
+  .period-quick-btn{
+    height:40px;
+    min-height:40px;
+    padding:0 4px;
+    font-size:11px;
+    border-radius:10px;
+  }
+  .period-select{
+    min-height:46px;
+    padding:0 11px;
+    font-size:12px;
+    border-radius:11px;
+  }
+}
+
 /* Mobile KPI: valores extensos permanecem totalmente dentro do card */
 @media (max-width:700px){
   .kpi .value{
