@@ -1340,7 +1340,7 @@ function openChartModal(chartId,title){
   let modalSub="Período: "+fmtMonth(state.start)+" → "+fmtMonth(state.end)+" · visão detalhada ampliada";
   if(chartId==="homeroChart"){
     const saldo=rows.reduce((sum,r)=>sum+num(r[1])-num(r[2]),0);
-    modalSub += " · Saldo: "+money(saldo);
+    modalSub += " · <strong>Saldo: "+money(saldo)+"</strong>";
   }
   document.getElementById("chartModalSub").textContent=modalSub;
   host.innerHTML=chartHtml;
