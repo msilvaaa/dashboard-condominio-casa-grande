@@ -1820,10 +1820,14 @@ function renderEditor(){
     }
     state.data[state.editorTab].push(arr);
     state.data[state.editorTab].sort((a,b)=>a[0].localeCompare(b[0]));
-    if(arr[0] > state.end){
-      state.end=arr[0];
-      fillPeriodSelectors();
+    // Atualiza os períodos sempre que uma linha mensal for criada ou substituída.
+    // Se o novo mês for posterior ao intervalo selecionado, acompanha o mês mais recente.
+    const monthsAfterSave=allDataMonths();
+    const latestMonth=monthsAfterSave.at(-1);
+    if(latestMonth && latestMonth > state.end){
+      state.end=latestMonth;
     }
+    fillPeriodSelectors();
     renderEditor();
     render();
     toast("Linha adicionada.");
