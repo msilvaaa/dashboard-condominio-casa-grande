@@ -1388,6 +1388,12 @@ h1{font-size:20px;line-height:1.2;margin:0 0 4px;font-weight:850}
 .sub{font-size:11px;color:#667085;margin:0 0 12px}
 .chart{background:#fbfcfe;border:1px solid #e7ecf2;border-radius:12px;padding:8px;overflow:visible}
 .chart svg{display:block;width:100%;height:auto;min-width:0!important}
+/* O eixo é HTML sobreposto ao SVG; estas regras também precisam existir na janela de impressão */
+.expanded-chart-scroll{position:relative;overflow:visible!important;border-radius:10px}
+.expanded-chart-inner{position:relative;width:100%;min-width:0}
+.expanded-y-axis{position:absolute;left:0;top:0;float:none;width:108px;height:620px;margin:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,#fbfcfe 82%,rgba(251,252,254,0))}
+.expanded-y-axis .axis-label{position:absolute;right:14px;transform:translateY(-50%);font-size:12px;font-weight:700;color:#667085;white-space:nowrap}
+
 .expanded-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0 0}
 .expanded-stat{border:1px solid #e7ecf2;border-radius:10px;background:#f8fafc;padding:8px 10px}
 .expanded-stat-label{font-size:8px;text-transform:uppercase;letter-spacing:.06em;color:#667085;font-weight:850}
