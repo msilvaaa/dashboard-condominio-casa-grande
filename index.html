@@ -742,14 +742,23 @@ async function neonGetSession(){
   return payload;
 }
 const state = {data: loadData(), start: "2025-01", end: "2026-08", editorTab: "main"};
-(function syncInitialPeriod(){
+let periodTouchedByUser=false;
+function syncInitialPeriod(){
+  // Ao abrir o painel, considerar apenas meses já encerrados.
+  // O início continua no primeiro mês do histórico; o fim usa o mês anterior,
+  // ou o mês mais recente disponível até essa data quando houver lacunas.
+  if(periodTouchedByUser) return;
   const months=allDataMonths();
-  if(months.length){
-    if(!months.includes(state.start)) state.start=months[0];
-    const latest=months[months.length-1];
-    if(latest>state.end) state.end=latest;
-  }
-})();
+  if(!months.length) return;
+  if(!months.includes(state.start)) state.start=months[0];
+  const previousMonth=new Date();
+  previousMonth.setDate(1);
+  previousMonth.setMonth(previousMonth.getMonth()-1);
+  const target=previousMonth.getFullYear()+"-"+String(previousMonth.getMonth()+1).padStart(2,"0");
+  const latestClosedMonth=months.filter(month=>month<=target).at(-1);
+  state.end=latestClosedMonth || months[months.length-1];
+}
+syncInitialPeriod();
 
 function clone(x){ return JSON.parse(JSON.stringify(x)); }
 function loadData(){ try{
@@ -1825,6 +1834,7 @@ function renderEditor(){
     const monthsAfterSave=allDataMonths();
     const latestMonth=monthsAfterSave.at(-1);
     if(latestMonth && latestMonth > state.end){
+      periodTouchedByUser=true;
       state.end=latestMonth;
     }
     fillPeriodSelectors();
@@ -1900,6 +1910,7 @@ function normalizePeriod(start,end){
   return {start,end};
 }
 function applyPeriod(){
+  periodTouchedByUser=true;
   const start=document.getElementById("startMonth").value;
   const end=document.getElementById("endMonth").value;
   const p=normalizePeriod(start,end);
@@ -1914,6 +1925,7 @@ function applyPeriod(){
   render();
 }
 function setQuickRange(type){
+  periodTouchedByUser=true;
   const months=allDataMonths();
   if(!months.length) return;
   const end=months.at(-1);
@@ -2171,6 +2183,7 @@ document.getElementById("saveData").addEventListener("click",async()=>{
     else rows.push(arr);
     rows.sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
     if(arr[0] > state.end){
+      periodTouchedByUser=true;
       state.end=arr[0];
       fillPeriodSelectors();
     }
