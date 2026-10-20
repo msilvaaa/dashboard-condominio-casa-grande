@@ -916,11 +916,16 @@ function tooltipForChart(id){
 }
 function showChartTooltip(tip, box, event, month, label, value){
   if(!tip || !box) return;
-  tip.innerHTML =
-    `<div class="tt-month">${fmtMonth(month)}</div>` +
-    `<div class="tt-series">${esc(label)}</div>` +
-    `<div class="tt-value">${money(value)}</div>`;
-  tip.classList.add("show");
+  // Atualiza o conteúdo apenas quando muda o ponto; evita trabalho repetido a cada movimento do mouse.
+  const key=String(month)+"|"+String(label)+"|"+String(value);
+  if(tip.dataset.tooltipKey!==key){
+    tip.innerHTML =
+      `<div class="tt-month">${fmtMonth(month)}</div>` +
+      `<div class="tt-series">${esc(label)}</div>` +
+      `<div class="tt-value">${money(value)}</div>`;
+    tip.dataset.tooltipKey=key;
+  }
+  if(!tip.classList.contains("show")) tip.classList.add("show");
   const rect=box.getBoundingClientRect();
   let left=event.clientX-rect.left+14;
   let top=event.clientY-rect.top+14;
