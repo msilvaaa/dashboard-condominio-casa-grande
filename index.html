@@ -1252,7 +1252,8 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
     s+='<path d="'+arr.map((v,i)=>(i?'L':'M')+x(i)+' '+y(v)).join(' ')+'" fill="none" stroke="'+colors[si]+'" stroke-width="'+strokeWidth+'" stroke-linecap="round" stroke-linejoin="round"/>';
     arr.forEach((v,i)=>{
       const cx=x(i), cy=y(v);
-      s+='<circle cx="'+cx+'" cy="'+cy+'" r="4.5" fill="'+colors[si]+'" stroke="#fff" stroke-width="1.8"><title>'+fmtMonth(rows[i][0])+' · '+labels[si]+': '+money(v)+'</title></circle>';
+      s+='<circle cx="'+cx+'" cy="'+cy+'" r="15" fill="transparent" stroke="transparent" pointer-events="all" data-tooltip-point data-i="'+i+'" data-si="'+si+'"></circle>';
+      s+='<circle cx="'+cx+'" cy="'+cy+'" r="4.5" fill="'+colors[si]+'" stroke="#fff" stroke-width="1.8" pointer-events="none"><title>'+fmtMonth(rows[i][0])+' · '+labels[si]+': '+money(v)+'</title></circle>';
     });
   });
 
@@ -1283,7 +1284,7 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   });
   const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:'+Math.max(1280,rows.length*110)+'px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
   const axis=expandedYAxisOverlay(lo,hi,H,pt,pb);
-  const scroll='<div class="expanded-chart-scroll"><div class="expanded-chart-inner">'+axis+svg+'</div></div>';
+  const scroll='<div class="expanded-chart-scroll"><div class="expanded-chart-inner">'+axis+svg+'<div class="chart-tooltip" id="expandedChartTip"></div></div></div>';
   return expandedStats(rows,cols,labels,colors)+scroll+buildExpandedTable(rows,cols,labels,colors);
 }
 function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
@@ -1305,7 +1306,7 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
       const v=num(r[c]), h=(H-pt-pb)*v/max;
       const x=pl+i*groupW+(groupW-cols.length*barW)/2+j*barW;
       const y=H-pb-h, bw=Math.max(9,barW-4);
-      s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="5" fill="'+colors[j]+'"><title>'+fmtMonth(r[0])+' · '+labels[j]+': '+money(v)+'</title></rect>';
+      s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="5" fill="'+colors[j]+'" data-tooltip-bar data-i="'+i+'" data-si="'+j+'"><title>'+fmtMonth(r[0])+' · '+labels[j]+': '+money(v)+'</title></rect>';
     });
   });
 
@@ -1336,7 +1337,7 @@ function expandedBarChart(rows, cols, labels, colors, alignCallouts=false){
   });
   const svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:'+Math.max(1280,rows.length*110)+'px;height:auto" aria-label="Gráfico ampliado detalhado">'+s+'</svg>';
   const axis=expandedYAxisOverlay(lo,hi,H,pt,pb);
-  const scroll='<div class="expanded-chart-scroll"><div class="expanded-chart-inner">'+axis+svg+'</div></div>';
+  const scroll='<div class="expanded-chart-scroll"><div class="expanded-chart-inner">'+axis+svg+'<div class="chart-tooltip" id="expandedChartTip"></div></div></div>';
   return expandedStats(rows,cols,labels,colors)+scroll+buildExpandedTable(rows,cols,labels,colors);
 }
 function openChartModal(chartId,title){
@@ -1391,6 +1392,13 @@ function openChartModal(chartId,title){
   document.getElementById("chartModalSub").style.fontWeight="400";
   document.getElementById("chartModalSub").style.color="";
   host.innerHTML=chartHtml;
+  // Tooltip exclusivo do gráfico ampliado; mantém o padrão visual e o posicionamento da página principal.
+  const expandedSvg=host.querySelector(".expanded-chart-inner svg");
+  const expandedTip=host.querySelector("#expandedChartTip");
+  if(expandedSvg && expandedTip){
+    if(chartHtml.includes("data-tooltip-point")) bindPointTooltips(expandedSvg,expandedTip,rows,cols,labels);
+    if(chartHtml.includes("data-tooltip-bar")) bindBarTooltips(expandedSvg,expandedTip,rows,cols,labels);
+  }
   modal.classList.add("open"); modal.setAttribute("aria-hidden","false");
   document.body.style.overflow="hidden";
   setTimeout(()=>document.getElementById("closeChartModal")?.focus(),0);
