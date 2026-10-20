@@ -226,6 +226,28 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.wrap{max-width:
   .chart-modal-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);width:100%;min-width:0;gap:8px}
   .chart-modal-actions .btn,.chart-modal-print{width:100%;min-width:0;max-width:100%;height:32px;min-height:32px;padding:0 6px;font-size:11px;white-space:nowrap}
 }
+/* Mantém os resumos e os rótulos legíveis quando o gráfico ampliado tem pouca largura */
+.chart-modal-box{container-type:inline-size}
+.expanded-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.expanded-stat{min-width:0;overflow-wrap:anywhere}
+.expanded-stat-value{font-size:clamp(13px,1.5vw,15px);line-height:1.25;overflow-wrap:anywhere;word-break:normal}
+.expanded-stat-note{font-size:10px;line-height:1.4;overflow-wrap:anywhere;word-break:normal}
+.expanded-stat-label{font-size:10px;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
+.expanded-chart-scroll{max-width:100%;overscroll-behavior-x:contain}
+@container (max-width:700px){
+  .expanded-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
+  .expanded-stat{padding:9px}
+  .expanded-stat-value{font-size:13px}
+  .expanded-stat-note{font-size:9px}
+}
+@media(max-width:800px){
+  .expanded-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
+  .expanded-stat{padding:9px;min-width:0}
+  .expanded-stat-value{font-size:13px;line-height:1.25;overflow-wrap:anywhere}
+  .expanded-stat-note{font-size:9px;line-height:1.4;overflow-wrap:anywhere}
+  .expanded-stat-label{font-size:9px;line-height:1.35;white-space:normal}
+  .expanded-chart-scroll{max-width:100%;overflow-x:auto}
+}
 .chart-modal-chart{background:#fbfcfe;border:1px solid #e7ecf2;border-radius:16px;padding:12px;overflow:auto}
 /* Eixo vertical fixo durante a rolagem horizontal dos gráficos ampliados */
 .expanded-chart-scroll{position:relative;overflow-x:auto;overflow-y:hidden;border-radius:10px}
