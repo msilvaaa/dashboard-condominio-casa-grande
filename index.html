@@ -648,7 +648,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
     <section class="card"><div class="title-row"><div><div class="title">Águas do Rio × Light</div><div class="tiny">Valores e resumo do período selecionado</div></div></div><div class="chart-wrap chart-area"><div id="utilitiesTip" class="chart-tooltip"></div><svg id="utilitiesChart" viewBox="0 0 560 280"></svg></div><div id="utilitiesSummary" class="chart-summary"></div></section>
     <section class="card"><div class="title-row"><div><div class="title">Internet × Gás Natural</div><div class="tiny">Valores e resumo do período selecionado</div></div></div><div class="chart-wrap chart-area"><div id="internetGasTip" class="chart-tooltip"></div><svg id="internetGasChart" viewBox="0 0 560 280"></svg></div><div id="internetGasSummary" class="chart-summary"></div></section>
     <section class="card"><div class="title-row"><div><div class="title">Despesas postais (correios) do condomínio</div><div class="tiny">Evolução e resumo do período selecionado</div></div></div><div class="chart-wrap chart-area"><div id="postalTip" class="chart-tooltip"></div><svg id="postalChart" viewBox="0 0 560 280"></svg></div><div id="postalSummary" class="chart-summary"></div></section>
-    <section class="card"><div class="title-row"><div><div class="title">Adiantamentos Homero</div><div class="tiny">Adiantamento, prestação de contas e resumo</div></div></div><div class="chart-wrap chart-area"><div id="homeroTip" class="chart-tooltip"></div><svg id="homeroChart" viewBox="0 0 560 280"></svg></div><div id="homeroSummary" class="chart-summary"></div></section>
+    <section class="card"><div class="title-row"><div><div class="title">Adiantamentos Síndico</div><div class="tiny">Adiantamento, prestação de contas e resumo</div></div></div><div class="chart-wrap chart-area"><div id="homeroTip" class="chart-tooltip"></div><svg id="homeroChart" viewBox="0 0 560 280"></svg></div><div id="homeroSummary" class="chart-summary"></div></section>
   </div>
 
   <section class="card table-card" style="margin-top:16px">
@@ -1508,7 +1508,7 @@ function closeChartModal(e){
 }
 
 function bindChartClicks(){
-  const charts=[["saldoChart","Evolução do saldo devedor"],["receitaChart","Arrecadação × despesas"],["fundoChart","Fundo de reserva x Garagem"],["utilitiesChart","Águas do Rio × Light"],["internetGasChart","Internet × Gás Natural"],["postalChart","Despesas postais (correios)"],["homeroChart","Adiantamentos Homero"],["rendimentosChart","Poupança Casa Grande"],["inadimplenciaChart","Inadimplência Casa Grande"]];
+  const charts=[["saldoChart","Evolução do saldo devedor"],["receitaChart","Arrecadação × despesas"],["fundoChart","Fundo de reserva x Garagem"],["utilitiesChart","Águas do Rio × Light"],["internetGasChart","Internet × Gás Natural"],["postalChart","Despesas postais (correios)"],["homeroChart","Adiantamentos Síndico"],["rendimentosChart","Poupança Casa Grande"],["inadimplenciaChart","Inadimplência Casa Grande"]];
   charts.forEach(([id,title])=>{
     const chart=document.getElementById(id); if(!chart) return;
     const wrapper=chart.closest(".chart-area"); if(!wrapper) return;
