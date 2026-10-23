@@ -1078,19 +1078,24 @@ function barChart(id, rows, cols, labels, colors, alignCallouts=false){
       const x=pl+p.i*groupW+(groupW-cols.length*barW)/2+j*barW;
       const bw=Math.max(3,barW-2);
       const cx=x+bw/2, y=H-pb-h;
-      const labelW=92,labelH=28;
+      // Use the same callout dimensions and typography as line charts.
+      const labelW=112,labelH=30;
       let bx=cx-labelW/2;
       bx=Math.max(pl+2,Math.min(W-pr-labelW-2,bx));
-      let by=alignCallouts
-        ? (p.tag==="Máx." ? 4 : 40)
-        : (p.tag==="Máx." ? y-labelH-12 : y+10);
+      let by;
+      if(alignCallouts){
+        // Separate callouts by series so maxima/minima do not stack on top of each other.
+        by=p.tag==="Máx." ? 4+j*31 : H-labelH-8-j*31;
+      }else{
+        by=p.tag==="Máx." ? y-labelH-12 : y+10;
+      }
       by=Math.max(4,Math.min(H-labelH-8,by));
 
       s+=`<line x1="${cx}" y1="${y}" x2="${cx}" y2="${p.tag==="Máx."?by+labelH:by}" stroke="${colors[j]}" stroke-width="1.2" opacity=".55"/>`;
       s+=`<g>
-        <rect x="${bx}" y="${by}" width="${labelW}" height="${labelH}" rx="8" fill="#ffffff" stroke="${colors[j]}" stroke-width="1.1"/>
-        <text x="${bx+8}" y="${by+11}" font-size="9" font-weight="800" fill="${colors[j]}">${p.tag}</text>
-        <text x="${bx+8}" y="${by+22}" font-size="10.5" font-weight="800" fill="#172033">${compactMoney(p.v)}</text>
+        <rect x="${bx}" y="${by}" width="${labelW}" height="${labelH}" rx="9" fill="#ffffff" stroke="${colors[j]}" stroke-width="1.2"/>
+        <text x="${bx+9}" y="${by+12}" font-size="9" font-weight="800" fill="${colors[j]}">${p.tag}</text>
+        <text x="${bx+9}" y="${by+23}" font-size="10.5" font-weight="800" fill="#172033">${compactMoney(p.v)}</text>
       </g>`;
     });
   });
