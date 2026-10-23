@@ -972,6 +972,8 @@ function bindBarTooltips(svg, tip, rows, cols, labels){
 
 function lineChart(id, rows, cols, labels, colors, strokeWidth=3.5){
   const el=document.getElementById(id), W=920,H=350,pl=74,pr=24,pt=36,pb=48;
+  // Keep month labels the same physical size even when SVG viewBoxes differ.
+  const monthFont=(12*W)/Math.max(1,el.clientWidth-16);
   if(!rows.length){el.innerHTML='<text x="50%" y="50%" text-anchor="middle" fill="#667085">Sem dados no período</text>';return}
   const series=cols.map(c=>rows.map(r=>num(r[c])));
   const all=series.flat();
@@ -1034,12 +1036,14 @@ function lineChart(id, rows, cols, labels, colors, strokeWidth=3.5){
 
   const step=Math.max(1,Math.ceil(rows.length/8));
   for(let i=0;i<rows.length;i+=step)
-    s+=`<text x="${x(i)}" y="${H-15}" text-anchor="middle" font-size="10.5" fill="#667085">${fmtMonth(rows[i][0])}</text>`;
+    s+=`<text x="${x(i)}" y="${H-15}" text-anchor="middle" font-size="${monthFont.toFixed(2)}" fill="#667085">${fmtMonth(rows[i][0])}</text>`;
   el.innerHTML=s;
   bindPointTooltips(el, tooltipForChart(id), rows, cols, labels);
 }
 function barChart(id, rows, cols, labels, colors, alignCallouts=false){
   const el=document.getElementById(id), W=560,H=280,pl=52,pr=16,pt=34,pb=42;
+  // Match the rendered month-label size used by line charts.
+  const monthFont=(12*W)/Math.max(1,el.clientWidth-16);
   if(!rows.length){el.innerHTML='<text x="50%" y="50%" text-anchor="middle" fill="#667085">Sem dados no período</text>';return}
 
   const vals=cols.map(c=>rows.map(r=>num(r[c])));
@@ -1103,7 +1107,7 @@ function barChart(id, rows, cols, labels, colors, alignCallouts=false){
   const step=Math.max(1,Math.ceil(rows.length/6));
   for(let i=0;i<rows.length;i+=step){
     const x=pl+i*groupW+groupW/2;
-    s+=`<text x="${x}" y="${H-14}" text-anchor="middle" font-size="10.5" fill="#667085">${fmtMonth(rows[i][0])}</text>`;
+    s+=`<text x="${x}" y="${H-14}" text-anchor="middle" font-size="${monthFont.toFixed(2)}" fill="#667085">${fmtMonth(rows[i][0])}</text>`;
   }
   el.innerHTML=s;
   bindBarTooltips(el, tooltipForChart(id), rows, cols, labels);
