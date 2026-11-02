@@ -1115,8 +1115,7 @@ function barChart(id, rows, cols, labels, colors, alignCallouts=false){
 function renderKPIs(rows){
   const latest=rows.at(-1), ar=rows.map(r=>num(r[4])), cond=rows.map(r=>num(r[2])), gar=rows.map(r=>num(r[5])), fund=rows.map(r=>num(r[3]));
   const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0, total=a=>a.reduce((x,y)=>x+y,0);
-  const saldoRows=withSaldoEvolution(rows);
-  const saldo=saldoRows.length?num(saldoRows.at(-1)[6]):0;
+  const saldo=latest?num(latest[1]):0;
   const cards=[
     ["Saldo atual",money(saldo),saldo>=0?"positivo":"negativo",saldo>=0?"green":"red"],
     ["Arrecadação média",money(avg(ar)),"por mês","blue"],
@@ -1705,9 +1704,8 @@ function render(){
   const rows=filtered(state.data.main);
   renderKPIs(rows);renderInsights(rows);renderTable(rows);
 
-  const saldoRows=withSaldoEvolution(rows);
-  lineChart("saldoChart",saldoRows,[6],["Saldo acumulado"],["#2563eb"]);
-  renderChartSummary("saldoSummary",saldoRows,[{col:6,label:"Saldo acumulado",color:"#2563eb"}],"","saldo-devedor-summary");
+  lineChart("saldoChart",rows,[1],["Saldo devedor"],["#2563eb"]);
+  renderChartSummary("saldoSummary",rows,[{col:1,label:"Saldo devedor",color:"#2563eb"}],"","saldo-devedor-summary");
 
   lineChart("receitaChart",rows,[4,2],["Arrecadação","Condomínio"],["#16a34a","#64748b"]);
   renderChartSummary("receitaSummary",rows,[
