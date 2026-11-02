@@ -1115,7 +1115,7 @@ function barChart(id, rows, cols, labels, colors, alignCallouts=false){
 function renderKPIs(rows){
   const latest=rows.at(-1), ar=rows.map(r=>num(r[4])), cond=rows.map(r=>num(r[2])), gar=rows.map(r=>num(r[5])), fund=rows.map(r=>num(r[3]));
   const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0, total=a=>a.reduce((x,y)=>x+y,0);
-  const saldo=latest?num(latest[1]):0;
+  const saldo=rows.reduce((sum,r)=>sum-Math.abs(num(r[1])),0);
   const cards=[
     ["Saldo atual",money(saldo),saldo>=0?"positivo":"negativo",saldo>=0?"green":"red"],
     ["Arrecadação média",money(avg(ar)),"por mês","blue"],
