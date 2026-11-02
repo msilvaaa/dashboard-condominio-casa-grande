@@ -1250,7 +1250,7 @@ function expandedYAxisOverlay(lo,hi,H=620,pt=58,pb=98){
   }
   return out+'</div>';
 }
-function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
+function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5, pointLabelValues=null){
   // Quanto maior o intervalo, maior a largura do gráfico. Assim os meses ficam afastados
   // e as etiquetas não precisam disputar o mesmo espaço.
   const W=Math.max(1460,rows.length*110),H=620,pl=108,pr=42,pt=58,pb=92;
@@ -1284,7 +1284,11 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
   series.forEach((arr,si)=>{
     arr.forEach((v,i)=>{
       if(i%labelStep!==0) return;
-      const cx=x(i), cy=y(v), text=money(v);
+      const cx=x(i), cy=y(v);
+      const labelValue=pointLabelValues && pointLabelValues[i] && pointLabelValues[i][si]!==undefined
+        ? num(pointLabelValues[i][si])
+        : v;
+      const text=money(labelValue);
       const preferred=cols.length>1 ? (si===0?"above":"below") : (i%2===0?"above":"below");
       const pos=expandedVerticalLabelPlacement(cx,cy,text,{left:pl+2,right:W-pr-2,top:pt+2,bottom:H-pb-2},preferred,used);
       used.push(pos);
@@ -1365,7 +1369,13 @@ function openChartModal(chartId,title){
   const host=document.getElementById("chartModalChart");
   if(!modal||!host) return;
   let rows=[],cols=[],labels=[],colors=[],chartHtml='';
-  if(chartId==="saldoChart"){ rows=filtered(withSaldoEvolution(state.data.main)); cols=[6]; labels=["Saldo devedor acumulado"]; colors=["#2563eb"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
+  if(chartId==="saldoChart"){
+    rows=filtered(withSaldoEvolution(state.data.main));
+    cols=[6]; labels=["Saldo devedor acumulado"]; colors=["#2563eb"];
+    const saldoPointLabels=rows.map((r,i)=>[
+      String(r[0])>="2026-07" && i<rows.length-1 ? num(r[1]) : num(r[6])
+    ]);
+    chartHtml=expandedLineChart(rows,cols,labels,colors,4.5,saldoPointLabels);
   }else if(chartId==="receitaChart"){ rows=filtered(state.data.main); cols=[4,2]; labels=["Arrecadação","Condomínio"]; colors=["#16a34a","#64748b"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
   }else if(chartId==="fundoChart"){ rows=filtered(state.data.main); cols=[3,5]; labels=["Fundo reserva","Garagem"]; colors=["#7c3aed","#d97706"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
   }else if(chartId==="utilitiesChart"){ rows=filtered(state.data.utilities); cols=[1,2]; labels=["Águas do Rio","Light"]; colors=["#0ea5e9","#f59e0b"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
