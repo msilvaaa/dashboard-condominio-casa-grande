@@ -1278,10 +1278,9 @@ function expandedLineChart(rows, cols, labels, colors, strokeWidth=4.5){
     });
   });
 
-  // Números horizontais e grandes. Em intervalos longos, mostra os valores de 2 em 2 meses
-  // para preservar a leitura sem eliminar os pontos do gráfico.
+  // Mostra o valor de todos os meses no gráfico ampliado, sem depender do hover.
   const used=[];
-  const labelStep=rows.length>12?2:1;
+  const labelStep=1;
   series.forEach((arr,si)=>{
     arr.forEach((v,i)=>{
       if(i%labelStep!==0) return;
