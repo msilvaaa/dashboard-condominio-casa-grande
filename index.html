@@ -567,7 +567,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
   <div class="top">
     <div>
       <div class="eyebrow">Análise financeira</div>
-      <div class="dashboard-title-row"><h1>Condomínio Casa Grande</h1><a class="btn primary convention-btn" data-document-title="Convenção do Condomínio Casa Grande" href="/convencao-casa-grande.pdf" title="Abrir a Convenção do Condomínio Casa Grande">Baixar Convenção 1979</a></div>
+      <div class="dashboard-title-row"><h1>Condomínio Casa Grande</h1><a class="btn primary convention-btn" href="/convencao-casa-grande.pdf" target="_blank" rel="noopener" title="Abrir a Convenção do Condomínio Casa Grande">Baixar Convenção 1979</a></div>
       <div class="sub">Acompanhe de forma clara a evolução financeira do condomínio, incluindo saldo, arrecadação, despesas, garagem, fundo de reserva e demais gastos. Os gráficos destacam os maiores e menores valores, e você pode passar o mouse sobre os pontos ou barras para consultar os valores exatos.</div>
     </div>
     <div class="controls">
@@ -619,7 +619,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
 
   <div class="grid layout-2" style="margin-top:16px">
     <section class="card">
-      <div class="title-row"><div class="dashboard-title-row"><div><div class="title">Fundo de reserva x Garagem</div><div class="tiny">Acompanhamento das duas séries</div></div><a class="btn primary convention-btn" data-document-title="Regulamento da Garagem" href="/Regulamento_Garagem_Casa_Grande_1973.pdf" title="Abrir o Regulamento da Garagem do Condomínio Casa Grande">Baixar Regulamento Garagem 1973</a></div></div>
+      <div class="title-row"><div class="dashboard-title-row"><div><div class="title">Fundo de reserva x Garagem</div><div class="tiny">Acompanhamento das duas séries</div></div><a class="btn primary convention-btn" href="/Regulamento_Garagem_Casa_Grande_1973.pdf" target="_blank" rel="noopener" title="Abrir o Regulamento da Garagem do Condomínio Casa Grande">Baixar Regulamento Garagem 1973</a></div></div>
       <div class="chart-wrap chart-area"><div id="fundoTip" class="chart-tooltip"></div><svg id="fundoChart" viewBox="0 0 920 350" aria-label="Gráfico do fundo de reserva e garagem"></svg></div><div id="fundoSummary" class="chart-summary"></div>
       <div class="legend"><span><i class="dot" style="background:#7c3aed"></i>Fundo reserva</span><span><i class="dot" style="background:#d97706"></i>Garagem</span></div>
     </section>
@@ -1501,55 +1501,6 @@ html.dark .value-cell{color:#172033!important}
 window.addEventListener("load",()=>setTimeout(()=>window.print(),250));
 window.addEventListener("afterprint",()=>setTimeout(()=>window.close(),150));
 <\/script>
-
-<style>
-/* Visualizador interno dos documentos do condomínio */
-.document-viewer{position:fixed;inset:0;z-index:500;background:#f4f7fb;display:none;flex-direction:column}
-.document-viewer.open{display:flex}
-.document-viewer-toolbar{display:flex;align-items:center;gap:14px;padding:12px 18px;background:#fff;border-bottom:1px solid #e7ecf2;box-shadow:0 2px 10px rgba(16,24,40,.06);flex:none}
-.document-viewer-back{border:0;border-radius:10px;background:#101828;color:#fff;padding:10px 15px;font-weight:800;white-space:nowrap}
-.document-viewer-title{font-size:14px;font-weight:800;color:#142033;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.document-viewer-frame{display:block;width:100%;height:100%;border:0;background:#e9eef5;flex:1;min-height:0}
-@media(max-width:600px){.document-viewer-toolbar{padding:10px;gap:10px}.document-viewer-back{padding:10px 12px;font-size:13px}.document-viewer-title{font-size:12px}}
-</style>
-<div id="documentViewer" class="document-viewer" role="dialog" aria-modal="true" aria-labelledby="documentViewerTitle" aria-hidden="true">
-  <div class="document-viewer-toolbar">
-    <button type="button" id="documentViewerBack" class="document-viewer-back">← Voltar ao Dashboard</button>
-    <div id="documentViewerTitle" class="document-viewer-title">Documento</div>
-  </div>
-  <iframe id="documentViewerFrame" class="document-viewer-frame" title="Visualizador de documento PDF"></iframe>
-</div>
-<script>
-(function(){
-  const viewer=document.getElementById("documentViewer");
-  const frame=document.getElementById("documentViewerFrame");
-  const title=document.getElementById("documentViewerTitle");
-  const back=document.getElementById("documentViewerBack");
-  if(!viewer||!frame||!title||!back)return;
-  function closeDocumentViewer(){
-    viewer.classList.remove("open");
-    viewer.setAttribute("aria-hidden","true");
-    frame.src="about:blank";
-    document.body.style.overflow="";
-  }
-  document.querySelectorAll("a.convention-btn").forEach(link=>{
-    link.addEventListener("click",event=>{
-      event.preventDefault();
-      title.textContent=link.dataset.documentTitle||link.textContent.trim();
-      frame.src=link.getAttribute("href");
-      viewer.classList.add("open");
-      viewer.setAttribute("aria-hidden","false");
-      document.body.style.overflow="hidden";
-      back.focus();
-    });
-  });
-  back.addEventListener("click",closeDocumentViewer);
-  document.addEventListener("keydown",event=>{
-    if(event.key==="Escape"&&viewer.classList.contains("open"))closeDocumentViewer();
-  });
-})();
-</script>
-
 </body>
 </html>`);
   doc.close();
