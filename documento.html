@@ -36,7 +36,8 @@ if (!doc) {
 } else {
   document.title = doc.title;
   document.getElementById("docTitle").textContent = doc.title;
-  document.getElementById("pdfViewer").src = doc.file + "#view=FitH";
+  // Amplia a visualização inicial para facilitar a leitura das páginas.
+  document.getElementById("pdfViewer").src = doc.file + "#zoom=200";
 }
 </script>
 </body>
