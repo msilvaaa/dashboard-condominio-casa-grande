@@ -1858,7 +1858,7 @@ function renderEditor(){
 
   const latestInad=state.editorTab==="inadimplencia" ? rows[rows.length-1] : null;
   const latestInadLabel=latestInad
-    ? "Último mês calculado: "+fullMonthLabel(String(latestInad[0]))+" · Inadimplência: "+formatEditorNumber(latestInad[1])
+    ? "Último mês calculado: "+fullMonthLabel(String(latestInad[0]))+" · Inadimplência: "+formatEditorNumber(latestInad[3])
     : "A inadimplência é calculada automaticamente.";
 
   document.getElementById("editorBody").innerHTML=`
