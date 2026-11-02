@@ -736,7 +736,7 @@ html.dark svg [fill="#ffffff"]{fill:#111827 !important}
       <label class="btn ghost" for="importJson" style="display:inline-flex;align-items:center">Importar JSON</label>
       <input id="importJson" type="file" accept=".json,application/json" style="display:none">
       <button class="btn danger" id="resetData">Restaurar dados originais</button>
-      <button class="btn primary" id="saveData">Salvar alterações</button>
+      <button type="button" class="btn primary" id="saveData">Salvar alterações</button>
     </div>
   </div>
 </div>
@@ -2211,7 +2211,9 @@ function handlePasswordRecovery(){
 
 document.getElementById("logoutEditor")?.addEventListener("click",logoutEditor);
 document.getElementById("closeEditor").addEventListener("click",()=>document.getElementById("editorModal").classList.remove("open"));
-document.getElementById("saveData").addEventListener("click",async()=>{
+document.getElementById("saveData").addEventListener("click",async(e)=>{
+  e.preventDefault();
+  const editorModal=document.getElementById("editorModal");
   const btn=document.getElementById("saveData");
   const oldText=btn.textContent;
   const d=defs[state.editorTab];
@@ -2252,6 +2254,8 @@ document.getElementById("saveData").addEventListener("click",async()=>{
   if(result.ok){
     render();
     renderEditor();
+    editorModal.classList.add("open");
+    editorModal.setAttribute("aria-hidden","false");
     toast("Dados salvos na nuvem com sucesso.");
   }else if(result.reason==="not_configured"){
     toast("Neon ainda não foi configurado neste arquivo.");
