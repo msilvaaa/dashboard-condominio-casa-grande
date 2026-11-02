@@ -901,11 +901,20 @@ function fmtMonth(s){ const [y,m]=s.split("-"); const names=["Jan","Fev","Mar","
 function filtered(rows){ return Array.isArray(rows) ? rows.filter(r=>r && r[0]>=state.start && r[0]<=state.end) : []; }
 
 function withSaldoEvolution(rows){
-  return rows.map((r,i)=>{
-    const current=Math.abs(num(r[1]));
-    const previous=i>0 ? Math.abs(num(rows[i-1][1])) : 0;
+  const ordered=(Array.isArray(rows)?rows:[]).slice().sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+  let accumulated=0;
+  let hasBase=false;
+  return ordered.map(r=>{
+    const month=String(r[0]);
+    const monthlySaldo=num(r[1]);
+    if(month<="2026-06" || !hasBase){
+      accumulated=monthlySaldo;
+      hasBase=true;
+    }else{
+      accumulated+=monthlySaldo;
+    }
     const copy=[...r];
-    copy[6]=i===0 ? current : previous+current;
+    copy[6]=accumulated;
     return copy;
   });
 }
@@ -1359,7 +1368,7 @@ function openChartModal(chartId,title){
   const host=document.getElementById("chartModalChart");
   if(!modal||!host) return;
   let rows=[],cols=[],labels=[],colors=[],chartHtml='';
-  if(chartId==="saldoChart"){ rows=withSaldoEvolution(filtered(state.data.main)); cols=[1]; labels=["Saldo devedor"]; colors=["#2563eb"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
+  if(chartId==="saldoChart"){ rows=filtered(withSaldoEvolution(state.data.main)); cols=[6]; labels=["Saldo devedor acumulado"]; colors=["#2563eb"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
   }else if(chartId==="receitaChart"){ rows=filtered(state.data.main); cols=[4,2]; labels=["Arrecadação","Condomínio"]; colors=["#16a34a","#64748b"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
   }else if(chartId==="fundoChart"){ rows=filtered(state.data.main); cols=[3,5]; labels=["Fundo reserva","Garagem"]; colors=["#7c3aed","#d97706"]; chartHtml=expandedLineChart(rows,cols,labels,colors);
   }else if(chartId==="utilitiesChart"){ rows=filtered(state.data.utilities); cols=[1,2]; labels=["Águas do Rio","Light"]; colors=["#0ea5e9","#f59e0b"]; chartHtml=expandedBarChart(rows,cols,labels,colors);
@@ -1704,8 +1713,9 @@ function render(){
   const rows=filtered(state.data.main);
   renderKPIs(rows);renderInsights(rows);renderTable(rows);
 
-  lineChart("saldoChart",rows,[1],["Saldo devedor"],["#2563eb"]);
-  renderChartSummary("saldoSummary",rows,[{col:1,label:"Saldo devedor",color:"#2563eb"}],"","saldo-devedor-summary");
+  const saldoEvolutionRows=filtered(withSaldoEvolution(state.data.main));
+  lineChart("saldoChart",saldoEvolutionRows,[6],["Saldo devedor acumulado"],["#2563eb"]);
+  renderChartSummary("saldoSummary",saldoEvolutionRows,[{col:6,label:"Saldo devedor acumulado",color:"#2563eb"}],"","saldo-devedor-summary");
 
   lineChart("receitaChart",rows,[4,2],["Arrecadação","Condomínio"],["#16a34a","#64748b"]);
   renderChartSummary("receitaSummary",rows,[
