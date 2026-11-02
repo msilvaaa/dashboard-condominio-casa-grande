@@ -13,21 +13,27 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidd
 .back{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border-radius:10px;background:#fff;color:#101828;text-decoration:none;font-weight:700;white-space:nowrap}
 .back:hover{background:#e8eef8}
 .doc-title{font-size:15px;font-weight:700;line-height:1.3}
-.viewer{display:block;flex:1 1 0;min-height:0;width:100%;height:100%;border:0;background:#dce3ec;overflow:auto}
+.pages{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:14px 10px 28px}
+.page{display:block;width:100%;max-width:1050px;height:auto;margin:0 auto 16px;background:#fff;box-shadow:0 1px 7px rgba(0,0,0,.18)}
+.status{text-align:center;padding:24px;color:#475467}
 @media(max-width:600px){
-  .toolbar{padding:10px;gap:10px;min-height:60px}
-  .back{padding:10px 12px;font-size:14px}
-  .doc-title{font-size:13px}
-  .viewer{flex:1 1 0;height:calc(100dvh - 60px);min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+ .toolbar{padding:10px;gap:10px;min-height:60px}
+ .back{padding:10px 12px;font-size:14px}
+ .doc-title{font-size:13px}
+ .pages{padding:8px 4px 20px}
+ .page{margin-bottom:10px}
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 <header class="toolbar">
 <a class="back" href="https://dashboardsaldodevedor.vercel.app/">← Voltar ao Dashboard</a>
 <div class="doc-title" id="docTitle">Documento do Condomínio Casa Grande</div>
 </header>
-<iframe class="viewer" id="pdfViewer" title="Documento em PDF" scrolling="yes"></iframe>
+<main class="pages" id="pages" aria-label="Páginas do documento">
+<div class="status" id="status">Carregando documento...</div>
+</main>
 <script>
 const documents = {
   convencao: { title: "Convenção do Condomínio Casa Grande — 1979", file: "/convencao-casa-grande.pdf" },
@@ -35,14 +41,46 @@ const documents = {
 };
 const key = new URLSearchParams(location.search).get("arquivo");
 const doc = documents[key];
-if (!doc) {
-  document.getElementById("docTitle").textContent = "Documento não encontrado";
-  document.getElementById("pdfViewer").remove();
-} else {
+const pages = document.getElementById("pages");
+const status = document.getElementById("status");
+
+async function showDocument() {
+  if (!doc) {
+    status.textContent = "Documento não encontrado.";
+    document.getElementById("docTitle").textContent = "Documento não encontrado";
+    return;
+  }
   document.title = doc.title;
   document.getElementById("docTitle").textContent = doc.title;
-  document.getElementById("pdfViewer").src = doc.file + "#zoom=200";
+  if (!window.pdfjsLib) {
+    status.textContent = "Não foi possível carregar o visualizador. Verifique sua conexão e tente novamente.";
+    return;
+  }
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  try {
+    const pdf = await pdfjsLib.getDocument(doc.file).promise;
+    status.remove();
+    for (let number = 1; number <= pdf.numPages; number++) {
+      const page = await pdf.getPage(number);
+      const base = page.getViewport({scale: 1});
+      const availableWidth = Math.max(280, Math.min(pages.clientWidth - 20, 1050));
+      const fitScale = availableWidth / base.width;
+      const outputScale = Math.min(window.devicePixelRatio || 1, 2);
+      const viewport = page.getViewport({scale: fitScale * outputScale});
+      const canvas = document.createElement("canvas");
+      canvas.className = "page";
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      canvas.style.width = Math.floor(base.width * fitScale) + "px";
+      canvas.style.height = Math.floor(base.height * fitScale) + "px";
+      pages.appendChild(canvas);
+      await page.render({canvasContext: canvas.getContext("2d"), viewport}).promise;
+    }
+  } catch (error) {
+    status.textContent = "Não foi possível abrir o PDF. Atualize a página e tente novamente.";
+  }
 }
+showDocument();
 </script>
 </body>
 </html>
