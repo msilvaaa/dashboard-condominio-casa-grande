@@ -8,13 +8,18 @@
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#172033}
-body{display:flex;flex-direction:column;min-height:100vh}
-.toolbar{position:relative;z-index:2;display:flex;align-items:center;gap:16px;padding:12px 18px;background:#101828;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.16)}
+body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.toolbar{position:relative;z-index:2;display:flex;flex:0 0 auto;align-items:center;gap:16px;padding:12px 18px;background:#101828;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.16)}
 .back{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border-radius:10px;background:#fff;color:#101828;text-decoration:none;font-weight:700;white-space:nowrap}
 .back:hover{background:#e8eef8}
 .doc-title{font-size:15px;font-weight:700;line-height:1.3}
-.viewer{flex:1;min-height:0;width:100%;border:0;background:#dce3ec}
-@media(max-width:600px){.toolbar{padding:10px;gap:10px}.back{padding:10px 12px;font-size:14px}.doc-title{font-size:13px}}
+.viewer{display:block;flex:1 1 0;min-height:0;width:100%;height:100%;border:0;background:#dce3ec;overflow:auto}
+@media(max-width:600px){
+  .toolbar{padding:10px;gap:10px;min-height:60px}
+  .back{padding:10px 12px;font-size:14px}
+  .doc-title{font-size:13px}
+  .viewer{flex:1 1 0;height:calc(100dvh - 60px);min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+}
 </style>
 </head>
 <body>
@@ -22,7 +27,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
 <a class="back" href="https://dashboardsaldodevedor.vercel.app/">← Voltar ao Dashboard</a>
 <div class="doc-title" id="docTitle">Documento do Condomínio Casa Grande</div>
 </header>
-<iframe class="viewer" id="pdfViewer" title="Documento em PDF"></iframe>
+<iframe class="viewer" id="pdfViewer" title="Documento em PDF" scrolling="yes"></iframe>
 <script>
 const documents = {
   convencao: { title: "Convenção do Condomínio Casa Grande — 1979", file: "/convencao-casa-grande.pdf" },
@@ -36,7 +41,6 @@ if (!doc) {
 } else {
   document.title = doc.title;
   document.getElementById("docTitle").textContent = doc.title;
-  // Amplia a visualização inicial para facilitar a leitura das páginas.
   document.getElementById("pdfViewer").src = doc.file + "#zoom=200";
 }
 </script>
