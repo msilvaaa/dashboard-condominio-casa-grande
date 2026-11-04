@@ -2293,6 +2293,22 @@ document.querySelectorAll(".period-quick-btn").forEach(btn=>btn.addEventListener
 fillPeriodSelectors();
 render();
 window.addEventListener("load",()=>bootCloudSync());
+
+// Em celulares, o navegador pode restaurar a página do cache com um modal ainda aberto.
+// Ao voltar para o dashboard, fecha todas as janelas sobrepostas e libera a rolagem.
+function closeTransientWindowsOnReturn(){
+  ["chartModal","loginModal","passwordRecoveryModal","editorModal"].forEach(id=>{
+    const modal=document.getElementById(id);
+    if(!modal)return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+  });
+  const chart=document.getElementById("chartModalChart");
+  if(chart) chart.innerHTML="";
+  document.body.style.overflow="";
+}
+window.addEventListener("pageshow",closeTransientWindowsOnReturn);
+window.addEventListener("popstate",closeTransientWindowsOnReturn);
 </script>
 </body>
 </html>
