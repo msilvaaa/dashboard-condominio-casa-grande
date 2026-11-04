@@ -28,13 +28,26 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidd
 </head>
 <body>
 <header class="toolbar">
-<a class="back" href="https://dashboardsaldodevedor.vercel.app/">← Voltar ao Dashboard</a>
+<button class="back" type="button" onclick="backToDashboard()">← Voltar ao Dashboard</button>
 <div class="doc-title" id="docTitle">Documento do Condomínio Casa Grande</div>
 </header>
 <main class="pages" id="pages" aria-label="Páginas do documento">
 <div class="status" id="status">Carregando documento...</div>
 </main>
 <script>
+function backToDashboard(){
+  const dashboardOrigin = window.location.origin;
+  let cameFromDashboard = false;
+  try {
+    cameFromDashboard = !!document.referrer && new URL(document.referrer).origin === dashboardOrigin;
+  } catch(e) {}
+  if (cameFromDashboard && window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.replace("/");
+  }
+}
+
 const documents = {
   convencao: { title: "Convenção do Condomínio Casa Grande — 1979", file: "/convencao-casa-grande.pdf" },
   garagem: { title: "Regulamento da Garagem — 1973", file: "/Regulamento_Garagem_Casa_Grande_1973.pdf" }
