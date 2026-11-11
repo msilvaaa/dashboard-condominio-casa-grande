@@ -904,12 +904,17 @@ function filtered(rows){ return Array.isArray(rows) ? rows.filter(r=>r && r[0]>=
 
 function withSaldoEvolution(rows){
   const ordered=(Array.isArray(rows)?rows:[]).slice().sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
-  let accumulated=0;
+  let accumulatedFromJuly=0;
   return ordered.map(r=>{
+    const month=String(r[0]);
     const monthlySaldo=num(r[1]);
-    accumulated+=monthlySaldo;
     const copy=[...r];
-    copy[6]=accumulated;
+    if(month<="2026-06"){
+      copy[6]=monthlySaldo;
+    }else{
+      accumulatedFromJuly+=monthlySaldo;
+      copy[6]=accumulatedFromJuly;
+    }
     return copy;
   });
 }
