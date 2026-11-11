@@ -903,17 +903,12 @@ function filtered(rows){ return Array.isArray(rows) ? rows.filter(r=>r && r[0]>=
 
 function withSaldoEvolution(rows){
   const ordered=(Array.isArray(rows)?rows:[]).slice().sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
-  let accumulatedFromJuly=0;
+  let accumulated=0;
   return ordered.map(r=>{
-    const month=String(r[0]);
     const monthlySaldo=num(r[1]);
+    accumulated+=monthlySaldo;
     const copy=[...r];
-    if(month<="2026-06"){
-      copy[6]=monthlySaldo;
-    }else{
-      accumulatedFromJuly+=monthlySaldo;
-      copy[6]=accumulatedFromJuly;
-    }
+    copy[6]=accumulated;
     return copy;
   });
 }
@@ -1551,10 +1546,12 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
   if(!rows || !rows.length){ box.innerHTML=""; return; }
 
   if(extraClass.includes("saldo-devedor-summary")){
-    const saldoAtual=num(rows.at(-1)[1]);
+    // Saldo atual soma somente a coluna "Saldo devedor" dentro do período filtrado.
+    const saldoAtual=rows.reduce((sum,r)=>sum+num(r[1]),0);
     const classe=saldoAtual>=0?"positivo":"negativo";
     const status=saldoAtual>=0?"positivo":"negativo";
-    const values=rows.map(r=>num(r[1]));
+    // Os demais indicadores acompanham os valores acumulados exibidos no gráfico.
+    const values=rows.map(r=>num(r[6]));
     const avg=values.reduce((a,b)=>a+b,0)/values.length;
     const max=Math.max(...values), min=Math.min(...values), last=values.at(-1);
     const total=values.reduce((a,b)=>a+b,0);
