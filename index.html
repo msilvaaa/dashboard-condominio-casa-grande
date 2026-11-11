@@ -73,7 +73,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.wrap{max-width:
 .saldo-devedor-summary .chart-summary-stat:last-child b{font-size:14px;color:#1d4ed8;font-weight:900}
 /* Resumo do saldo devedor seguindo o Saldo Atual */
 .saldo-devedor-summary .saldo-devedor-extra-grid{display:block}
-.saldo-devedor-summary .saldo-summary-card{display:grid;grid-template-columns:minmax(180px,1.2fr) repeat(4,minmax(128px,1fr));align-items:center;gap:0;padding:13px 16px;border-color:#dbe4f0;background:linear-gradient(135deg,#ffffff 0%,#f7faff 100%);box-shadow:0 2px 8px rgba(16,24,40,.05)}
+.saldo-devedor-summary .saldo-summary-card{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;gap:0;padding:13px 16px;border-color:#dbe4f0;background:linear-gradient(135deg,#ffffff 0%,#f7faff 100%);box-shadow:0 2px 8px rgba(16,24,40,.05)}
 .saldo-devedor-summary .saldo-atual-summary{padding:0 16px 0 0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .saldo-devedor-summary .saldo-summary-card>.chart-summary-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;padding:2px 10px;border-top:0;border-left:1px solid #e7edf5;min-height:42px}
 .saldo-devedor-summary .saldo-summary-card>.chart-summary-stat span{text-align:center}.saldo-devedor-summary .saldo-summary-card>.chart-summary-stat b{max-width:none;overflow:visible;text-overflow:clip;font-size:12px}
@@ -85,15 +85,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.wrap{max-width:
 .saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-value{font-size:19px;line-height:1.15;font-weight:900;color:#172033;white-space:nowrap}
 .saldo-devedor-summary .saldo-summary-card .saldo-atual-summary-badge{width:max-content;margin:8px auto 0;padding:5px 12px;border-radius:999px;font-size:10px;font-weight:900;text-transform:lowercase}
 .saldo-devedor-summary .saldo-atual-summary{
-  display:flex;flex-direction:column;align-items:flex-start;
-  padding:14px 16px;border:1px solid #dbe4f0;border-radius:12px;
-  background:#fff;box-shadow:0 2px 8px rgba(16,24,40,.05);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:0;min-height:48px;margin-right:8px;padding:8px 10px;
+  border:0;border-radius:9px;background:#eff6ff;box-shadow:none;text-align:center;
 }
 .saldo-devedor-summary .saldo-atual-summary-label{
-  font-size:10px;font-weight:800;color:#667085;margin-bottom:6px;
+  font-size:8.5px;font-weight:800;color:#2563eb;margin-bottom:3px;
+  text-transform:uppercase;letter-spacing:.045em;
 }
 .saldo-devedor-summary .saldo-atual-summary-value{
-  font-size:22px;line-height:1.15;font-weight:900;color:#172033;
+  font-size:14px;line-height:1.15;font-weight:900;color:#1d4ed8;
   white-space:nowrap;
 }
 .saldo-devedor-summary .saldo-atual-summary-badge{
@@ -1564,7 +1565,6 @@ function renderChartSummary(containerId, rows, series, title, extraClass=""){
           '<div class="saldo-atual-summary">'+
             '<div class="saldo-atual-summary-label">Saldo atual</div>'+
             '<div class="saldo-atual-summary-value">'+money(saldoAtual)+'</div>'+
-            '<div class="saldo-atual-summary-badge '+classe+'">'+status+'</div>'+
           '</div>'+
           '<div class="chart-summary-stat"><span>Média mensal</span><b>'+money(avg)+'</b></div>'+
           '<div class="chart-summary-stat"><span>Maior valor</span><b>'+money(max)+'</b></div>'+
